@@ -1,4 +1,5 @@
 pasc
 src/*~
 include/*~
+src/*.o
 

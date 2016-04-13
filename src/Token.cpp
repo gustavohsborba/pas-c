@@ -1,4 +1,4 @@
-#include "backend/Token.h"
+#include "frontend/Token.h"
 
 Token& Token::operator=(const Token& token) {
 	type = token.type;

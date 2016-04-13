@@ -1,5 +1,5 @@
 CC=g++
-SOURCES=src/*
+SOURCES=$(shell echo src/*)
 OBJS=$(SOURCES:.cpp=.o)
 EXECUTABLE=pasc
 CFLAGS=-Iinclude -c -Wall

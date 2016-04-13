@@ -12,6 +12,8 @@ public:
 		value = "";
 	};
 
+	Token(TokenType type) : type(type), value("") {}
+
 	Token(TokenType type, const string& value) : type(type), value(value) {}
 
 	Token& operator=(const Token& token);
