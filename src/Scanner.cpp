@@ -2,8 +2,22 @@
 #include "frontend/TokenType.h"
 #include "frontend/Scanner.h"
 
+#include <cstdio>
+#include <sstream>
+#include <typeinfo>
+
+using std::stringstream;
 
 map<string, Token> Scanner::reservedWords;
+
+#include <iostream>
+
+Scanner::~Scanner() {
+	if(string("ifstream") == typeid(*in).name())
+		((ifstream*)in)->close();
+
+	delete in;
+}
 
 void Scanner::init() {
 	reservedWords["var"] = Token(TOK_VAR);
@@ -25,6 +39,18 @@ void Scanner::init() {
 }
 
 Token Scanner::nextToken() {
+	while(peek() == ' ' || peek() == '\n' || peek() == '\t')
+		get();
+
+	if(isalpha(peek()))
+		return getLiteral();
+	else if(isdigit(peek()))
+		return getNumerical();
+	else if(peek() == '{')
+		return getString();
+	else
+		return getOperator();
+
 	return Token();
 }
 
@@ -40,69 +66,134 @@ Token Scanner::getOperator() {
 
 	Token op;
 
-	if(in.peek() == ':') {
-		in.get();
-		if(in.peek() == '=') {
-			in.get();
+	if(peek() == ':') {
+		get();
+		if(peek() == '=') {
+			get();
 			op = Token(TOK_ASSIGN);
 		}
-	} else if(in.peek() == '<') {
-		in.get();
-		if(in.peek() == '=') {
-			in.get();
+	} else if(peek() == '<') {
+		get();
+		if(peek() == '=') {
+			get();
 			op = Token(TOK_LTE);
 		}
-		else if(in.peek() == '>') {
-			in.get();
+		else if(peek() == '>') {
+			get();
 			op = Token(TOK_DIFF);
 		} else {
 			op = Token(TOK_LT);
 		}
-	} else if(in.peek() == '>') {
-		in.get();
-		if(in.peek() == '=') {
-			in.get();
+	} else if(peek() == '>') {
+		get();
+		if(peek() == '=') {
+			get();
 			op = Token(TOK_GTE);
 		}
 		else {
 			op = Token(TOK_GT);
 		}
-	} else if(in.peek() == '=') {
-		in.get();
+	} else if(peek() == '=') {
+		get();
 		op = Token(TOK_EQUALS);
-	} else if(in.peek() == ',') {
-		in.get();
+	} else if(peek() == ',') {
+		get();
 		op = Token(TOK_COMMA);
-	} else if(in.get() == ';') {
-		in.get();
+	} else if(get() == ';') {
+		get();
 		op = Token(TOK_SEMICOLON);
-	} else if(in.peek() == '+') {
-		in.get();
+	} else if(peek() == '+') {
+		get();
 		op = Token(TOK_ADD);
-	} else if(in.peek() == '-') {
-		in.get();
+	} else if(peek() == '-') {
+		get();
 		op = Token(TOK_SUB);
-	} else if(in.peek() == '*') {
-		in.get();
+	} else if(peek() == '*') {
+		get();
 		op = Token(TOK_MULT);
-	} else if(in.peek() == '/') {
-		in.get();
+	} else if(peek() == '/') {
+		get();
 		op = Token(TOK_DIV);
-	} else if(in.peek() == '(') {
-		in.get();
+	} else if(peek() == '(') {
+		get();
 		op = Token(TOK_PAR_OPEN);
-	} else if(in.peek() == ')') {
-		in.get();
+	} else if(peek() == ')') {
+		get();
 		op = Token(TOK_PAR_CLOSE);
 	}
 
 	return op;
 }
 
+
 Token Scanner::getLiteral() {
+	stringstream s;
+
+	while(isalnum(peek()) || peek() == '_') {
+		s << get();
+	}
+	
+
+	if(reservedWords.count(s.str())) {
+		return Token(reservedWords[s.str()]);
+	} else if(isalpha(s.str()[0]) && s.str().length() <= MAX_IDENTIFIER_SIZE) {
+		return Token(TOK_ID, s.str());
+	}
+
+
+
 	return Token();
 }
 
 Token Scanner::getNumerical() {
+	stringstream s;
+
+	if(peek() == '0') {
+		s << get();
+
+		return Token(TOK_CONST_INT, s.str());
+	}
+
+	while(isdigit(peek())) {
+		s << get();
+	}
+
+	return Token(TOK_CONST_INT, s.str());
+}
+
+Token Scanner::getString() {
+	stringstream s;
+
+	if(peek() == '{') {
+		get();
+
+		while(peek() != '}') {
+
+			s << get();
+		}
+
+		get();
+
+		return Token(TOK_CONST_STR, s.str());
+	}
+
 	return Token();
+}
+
+char Scanner::get() {
+
+	char c = in->get();
+
+	columnCount++;
+	
+	if(c == '\n') {
+		lineCount++;
+		columnCount = 0;
+	}
+
+	return c;
+}
+
+char Scanner::peek() {
+	return in->peek(); 
 }

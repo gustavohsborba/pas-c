@@ -7,6 +7,7 @@
 
 #include "frontend/Token.h"
 
+using std::istream;
 using std::ifstream;
 using std::map;
 using std::string;
@@ -14,8 +15,17 @@ using std::string;
 class Scanner {
 public:
 
-	Scanner(string fileName) : fileName(fileName) {
+	Scanner(string fileName) {
 		lineCount = columnCount = 0;
+		this->fileName = fileName;
+		in = new ifstream(fileName.c_str());
+
+		if(!((ifstream*)in)->is_open())
+			throw "Aow deu pau";
+	}
+
+	Scanner(istream& in) {
+		this-> in = &in;
 	}
 
 	~Scanner();
@@ -38,9 +48,12 @@ private:
 	*/
 	Token getString();
 
+	char get();
+	char peek();
+
 
 	string fileName;
-	ifstream in;
+	istream *in;
 	long lineCount;
 	long columnCount;
 

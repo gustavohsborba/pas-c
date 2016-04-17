@@ -1,5 +1,5 @@
 CC=g++
-SOURCES=$(shell echo src/*)
+SOURCES=$(shell echo src/*.cpp)
 OBJS=$(SOURCES:.cpp=.o)
 EXECUTABLE=pasc
 CFLAGS=-Iinclude -c -Wall
@@ -8,7 +8,7 @@ LDFLAGS=
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@

@@ -51,4 +51,6 @@ typedef enum TokenType {
 	TOK_UNKNOWN		= bit(63)
 }TokenType;
 
+#define MAX_IDENTIFIER_SIZE 15 
+
 #endif

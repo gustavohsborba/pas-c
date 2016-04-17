@@ -1,5 +1,10 @@
 #include "frontend/Token.h"
 
+Token::~Token() {
+	value = "";
+	type = TOK_UNKNOWN;
+}
+
 Token& Token::operator=(const Token& token) {
 	type = token.type;
 	value = token.value;
@@ -13,9 +18,4 @@ TokenType Token::getType() const {
 
 string Token::getValue() const {
 	return value;
-}
-
-Token::~Token() {
-	value = "";
-	type = TOK_UNKNOWN;
 }
