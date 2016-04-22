@@ -1,13 +1,16 @@
 #include <iostream>
 
-#include "frontend/Scanner.h"
+#include "test/TestCase.h"
+#include "test/ScannerTest.h"
 
-using namespace std;
+#include "frontend/Scanner.h"
 
 int main(int argc, char** argv) {
 	Scanner::init();
 
-	Scanner scanner("tests/test1.psc");
+#ifdef RUN_TESTS
+	TEST(Scanner) 
+#endif
 
-	cout << (scanner.nextToken().getType() & TOK_BEGIN) << endl;
+	return 0;
 }

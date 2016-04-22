@@ -2,7 +2,7 @@ CC=g++
 SOURCES=$(shell echo src/*.cpp)
 OBJS=$(SOURCES:.cpp=.o)
 EXECUTABLE=pasc
-CFLAGS=-Iinclude -c -Wall
+CFLAGS=-Iinclude -c -Wall -g -DRUN_TESTS
 LDFLAGS=
 
 all: $(SOURCES) $(EXECUTABLE)

@@ -15,17 +15,9 @@ using std::string;
 class Scanner {
 public:
 
-	Scanner(string fileName) {
-		lineCount = columnCount = 0;
-		this->fileName = fileName;
-		in = new ifstream(fileName.c_str());
-
-		if(!((ifstream*)in)->is_open())
-			throw "Aow deu pau";
-	}
-
 	Scanner(istream& in) {
-		this-> in = &in;
+		this->in = &in;
+		lineCount = columnCount = 0;
 	}
 
 	~Scanner();

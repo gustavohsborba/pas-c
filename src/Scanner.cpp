@@ -13,10 +13,6 @@ map<string, Token> Scanner::reservedWords;
 #include <iostream>
 
 Scanner::~Scanner() {
-	if(string("ifstream") == typeid(*in).name())
-		((ifstream*)in)->close();
-
-	delete in;
 }
 
 void Scanner::init() {
