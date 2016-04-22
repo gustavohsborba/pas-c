@@ -7,10 +7,9 @@
 using std::string;
 
 #define bit(i) (1L<<i)
-#define lex_no(i) ((long)log2(i))
+#define tok_no(i) ((long)log2(i))
 
 typedef enum TokenType {
-
 	TOK_VAR 		= bit(0),
 	TOK_BEGIN 		= bit(1),
 	TOK_END 		= bit(2),
@@ -47,10 +46,54 @@ typedef enum TokenType {
 	TOK_STR_CLOSE	= bit(33),
 	TOK_PAR_OPEN	= bit(34),
 	TOK_PAR_CLOSE	= bit(35),
+	TOK_EOF			= bit(36),
 
-	TOK_UNKNOWN		= bit(63)
+	TOK_UNKNOWN		= bit(37)
 }TokenType;
 
 #define MAX_IDENTIFIER_SIZE 15 
+
+const string TOKEN_NAME [] = {
+	"TOK_VAR",
+	"TOK_BEGIN",
+	"TOK_END",
+	"TOK_IS",
+	"TOK_IF",
+	"TOK_THEN",
+	"TOK_ELSE",
+	"TOK_INT",
+	"TOK_STRING",
+	"TOK_DO",
+	"TOK_WHILE",
+	"TOK_IN",
+	"TOK_OUT",
+	"TOK_NOT",
+	"TOK_OR",
+	"TOK_AND",
+	"TOK_ID",
+	"TOK_INT",
+	"TOK_STR",
+	"TOK_EQUALS",
+	"TOK_LT",
+	"TOK_GT",
+	"TOK_LTE",
+	"TOK_GTE",
+	"TOK_DIFF",
+	"TOK_ADD",
+	"TOK_SUB",
+	"TOK_MULT",
+	"TOK_DIV",
+	"TOK_ASSIGN",
+	"TOK_SEMICOLON",
+	"TOK_COMMA",
+	"TOK_STR_OPEN",
+	"TOK_STR_CLOSE",
+	"TOK_PAR_OPEN",
+	"TOK_PAR_CLOSE",
+	"TOK_EOF",
+	"TOK_UNKNOWN",
+};
+
+#define tok_name(t) (TOKEN_NAME[tok_no(t)])
 
 #endif

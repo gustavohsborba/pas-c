@@ -1,6 +1,7 @@
 #ifndef _SCANNER_TEST_H
 #define _SCANNER_TEST_H
 
+#include <iostream>
 #include <fstream>
 
 #include "frontend/Scanner.h"
@@ -8,6 +9,8 @@
 #include "test/TestCase.h"
 
 using std::fstream;
+using std::cout;
+using std::endl;
 
 INIT_TEST(Scanner)
 	fstream code;
@@ -28,20 +31,21 @@ INIT_TEST(Scanner)
 	 out(result);
 	end
 	 */
+	Token t;
 
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_VAR); 	// var
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_ID); 	// a
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_COMMA);	// ,
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_ID);	// b
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_COMMA);	// ,
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_ID); 	// c
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_IS);	// is
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_INT); // int
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_SEMICOLON); // ;
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_ID); // result
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_IS); // is
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_INT); // int
-	ASSERT_EQUALS(scan.nextToken().getType(), TOK_INT);
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_VAR, cout << "Read " << t << endl ); 	// var
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_ID,  cout << "Read " << t << endl); 	// a
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_COMMA, cout << "Read " << t << endl);	// ,
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_ID, cout << "Read " << t << endl);	// b
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_COMMA, cout << "Read " << t << endl);	// ,
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_ID, cout << "Read " << t << endl); 	// c
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_IS, cout << "Read " << t << endl);	// is
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_INT, cout << "Read " << t << endl); // int
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_SEMICOLON, cout << "Read " << t << endl); // ;
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_ID, cout << "Read " << t << endl); // result
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_IS, cout << "Read " << t << endl); // is
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_INT, cout << "Read " << t << endl); // int
+	ASSERT_EQUALS(t = scan.nextToken(), TOK_BEGIN, cout << "Read " << t << endl);
 END_TEST()
 
 #endif

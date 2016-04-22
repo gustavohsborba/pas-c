@@ -1,9 +1,11 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <ostream>
 #include <string>
 
 #include "TokenType.h"
+using std::ostream;
 
 class Token {
 public:
@@ -23,9 +25,24 @@ public:
 
 	~Token();
 
+	inline bool operator ==(const Token& t) {
+		return value == t.value &&  type == t.type;
+	}
+
+	inline bool operator == (const TokenType type) {
+		return this->type == type;
+	}
+
+	friend ostream& operator<<(ostream& out, const Token& t) {
+		out << "(" << tok_name(t.getType()) << ", " << t.getValue() << ")";
+		return out;
+	}
+
 private:
 	TokenType type;
 	string value;
 };
+
+
 
 #endif 
