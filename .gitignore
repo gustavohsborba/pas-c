@@ -6,3 +6,7 @@ include/*~
 src/*.o
 .idea/*
 CMakeLists.txt
+*.aux
+*.log
+*.toc
+*.synctex.gz

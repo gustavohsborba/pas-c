@@ -1,0 +1,446 @@
+\documentclass[11pt]{article}
+
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{a4wide}
+\usepackage{fancyhdr}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{empheq}
+\usetikzlibrary{trees}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{amssymb,amsmath}
+\usepackage{amsthm,amsfonts}
+\usepackage{float}
+\graphicspath{ {images/} }
+\usepackage{listings}
+\usepackage{color}
+
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0.1pt}
+
+
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  columns=flexible,
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  %deletekeywords={...},           % if you want to delete keywords from the given language
+  %escapeinside={\%*}{*)},         % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=leftline,	               % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Make,                   % the language of the code
+  %otherkeywords={*,...},          % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=10pt,                  % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  %rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=4,	                   % sets default tabsize to 2 spaces
+  %title=\lstname                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+  xleftmargin=1cm
+}
+
+
+
+
+\lhead{Analisador Léxico e Tabela de Símbolos}
+\rhead{\thepage} 
+\lfoot{ Felipe Duarte, Gustavo Borba, Juan Lopes }
+\rfoot{ \today }
+\cfoot{}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{center}
+\begin{minipage}[l]{10cm}{
+\center
+Compiladores \\
+2016/01 \\
+}\end{minipage}
+ \vfill
+ \begin{minipage}[l]{11cm}{
+   \begin{center}
+   \Large{Trabalho Prático 01: \\ Analisador Léxico e Tabela de Símbolos}
+   \end{center}
+}\end{minipage}
+\end{center}
+ \vspace*{8cm}
+ \begin{center}
+ \begin{minipage}[l]{10cm}{
+ \center Felipe Duarte, Gustavo  Borba, Juan Lopes\\
+ Belo Horizonte, \today \\
+ }
+ \end{minipage}
+ \end{center}
+
+\newpage
+\thispagestyle{empty}
+\tableofcontents
+
+\newpage
+\clearpage
+\setcounter{page}{1}
+
+\section{Introdução}
+	O programa pas-c é um projeto desenvolvido na aula de Compiladores do Curso de Engenharia da Computação do CEFET-MG. Pas-c é a linguagem homônima, definida para esse compilador, cuja semântica dos comandos e expressões é a tradicional de linguagens como Pascal e C (daí seu nome).
+	
+	\subsection{A Linguagem Pas-c}
+
+		Definimos a gramática da linguagem:
+		
+		\begin{lstlisting}
+program ::= [ var decl-list] begin stmt-list end
+decl-list ::= decl ";" { decl ";"}
+decl ::= ident-list is type
+ident-list ::= identifier {"," identifier}
+type ::= int | string
+stmt-list ::= stmt ";" { stmt ";"}
+stmt ::= assign-stmt | if-stmt | do-stmt | read-stmt | write-stmt
+assign-stmt ::= identifier ":=" simple_expr
+if-stmt ::= if condition then stmt-list end 
+			| if condition then stmt-list else stmt-list end
+condition ::= expression
+do-stmt ::= do stmt-list stmt-suffix
+stmt-suffix ::= while condition
+read-stmt ::= in "(" identifier ")"
+write-stmt ::= out "(" writable ")"
+writable ::= simple-expr
+expression ::= simple-expr | simple-expr relop simple-expr
+simple-expr ::= term | simple-expr addop term
+term ::= factor-a | term mulop factor-a
+fator-a ::= factor | not factor | "-" factor
+factor ::= identifier | constant | "(" expression ")"
+relop ::= "=" | ">" | ">=" | "<" | "<=" | "<>"
+addop ::= "+" | "-" | or
+mulop ::= "*" | "/" | and
+constant ::= integer_const | literal
+integer_const ::= nozero {digit} | "0"
+literal ::= " {" {caractere} "}"
+identifier ::= (letter) {letter | digit } 
+				| "_" (letter | digit ) {letter | digit }
+letter ::= [A-Za-z]
+digit ::= [0-9]
+nozero ::= [1-9]
+caractere ::= um dos 256 caracteres do conjunto ASCII, 
+				exceto "{", "}" e quebra de linha
+		\end{lstlisting}
+
+\newpage
+\section{Uso do compilaodor}
+
+	
+	\subsection{Compilando o Compilador Pas-c}
+
+		Para compilar o seu código (neste momento, apenas como analizador léxico), basta ter um compilador G++ versão 4.8 ou superior com cmake instalado em sua máquina.
+		
+		Na pasta do projeto execute o comando:
+\begin{lstlisting}[language=C++]
+make
+\end{lstlisting} 
+		
+		Esse comando deverá gerar a seguinte seqûencia de comandos:
+\begin{lstlisting}[language=C++]
+g++ -Iinclude -c -Wall -g -DRUN_TESTS src/Scanner.cpp -o src/Scanner.o
+g++ -Iinclude -c -Wall -g -DRUN_TESTS src/TestCase.cpp -o src/TestCase.o
+g++ -Iinclude -c -Wall -g -DRUN_TESTS src/Token.cpp -o src/Token.o
+g++ -Iinclude -c -Wall -g -DRUN_TESTS src/main.cpp -o src/main.o
+g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
+\end{lstlisting}
+		
+		Pronto! Agora o executável \textbf{pasc} está pronto para compilar seus programas em Pas-c!
+	
+	
+	\subsection{Compilando um programa em Pas-c}
+	
+		Para executar o compilador, basta executar o comando:
+		
+		\begin{verbatim}
+			pasc caminho_para_seu_codigo.pasc
+		\end{verbatim}
+	
+
+\newpage
+\section{A Implementação do Compilador}
+	
+	\subsection{A abordagem utilizada na implementação}
+		
+		O compilador \textbf{pas-c} utiliza um analisador léxico recursivo, e quem vai saber explicar essas parada toda é o japão, eu nem estudei pra segunda prova ainda. 
+		
+	\subsection{A Estrutura do Projeto}
+		
+		O projeto segue a estrutura básica de todo projeto em C++, contendo uma pasta \textbf{include} e, dentro desta, separados por módulos, os headers (.h) com as declarações das classes. A pasta \textbf{src} contém a implementação das classes, bem como a função principal \textbf{main}:
+		
+		\begin{verbatim}
+			include/ -- Pasta para os headers
+			include/frontend -- pasta contendo as definições para os analisadores.
+			include/backend -- ainda por fazer.
+			include/test -- Pasta com os headers referentes aos testes unitários
+			src/ -- Implementação das classes
+			tests/ -- Pasta com a implementação dos testes unitários 
+		\end{verbatim}
+		
+		
+		
+	\subsection{Principais Classes da Aplicação}
+		
+		
+		\begin{itemize}
+			
+			\item \textbf{Token: }A classe Token descreve a unidade lógica mais básica do compilador. Ela apresenta apenas um valor, em formato de cadeia de caracteres, e seu \textbf{Tipo}, a ser elucidado no próximo item. 
+			
+			\item \textbf{TokenType: } TokenType trata-se apenas de um enum, que define, através de um bitmap, a lista de tokens reconhecidos pelo compilador, bem como um tipo UNKNOWN, para todo e qualquer token que não corresponder a nenhuma definição da linguagem.
+			
+			\item \textbf{Scanner: } O analisador léxico está concentrado basicamente na classe Scanner. Essa classe contém os métodos \textbf{getNumerical}, \textbf{getLiteral} e \textbf{getOperator}, que são responsáveis por captar os tokens, bem como o método \textbf{getString}. Este último é necessário por que uma vez que se abre um caracter delimitador de string, espacos em brancos passam a ser caracteres significativos. Também estão definidos nessa classe os contadores de linhas e colunas do código-fonte.
+		
+		\end{itemize}
+		
+
+\newpage
+\section{Resultados dos testes especificados}
+
+
+
+
+	\subsection{Teste 1}
+	
+	
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	a, b, c is int;
+	result is int
+begin
+	in (a);
+	in (c);
+	b := 10;
+	result := (a * c)/(b + 5 - 345);
+	out(result);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+	
+	
+	
+\subsection{Teste 2}
+	
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+	a, _ is int;
+	b is int;
+	nome is string;
+begin
+	in (a);
+	in (nome);
+	b := a * a;
+	b := b + a/2 * (3 + 5);
+	out (nome);
+	out(b);
+end.
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+\subsection{Teste 3}
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	_cont is int;
+	media, altura, soma_ is int;
+	begin
+	_cont := 5;
+	soma = 0;
+	
+	do
+		write({Altura: });
+		in (altura);
+		soma := soma altura;
+		_cont := _cont - 1;
+	while(_cont);
+	
+	out({Media: });
+	out (soma / qtd);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+
+\subsection{Teste 4}
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	i, j, k, @total, 1soma is int;
+
+begin
+	i := 4 * (5-3 * 50 / 10;
+	j := i * 10;
+	k := i* j / k;
+	k := 4 + a $;
+	out(i);
+	out(j);
+	out(k);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+	
+\subsection{Teste 5}
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	j, k is int;
+	a, j real;
+
+begin
+	read(j);
+	read(K);
+	
+	if (k <> 0)
+		result := j/k
+	else
+		result := 0
+	end;
+
+ 	out(result);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+
+\subsection{Teste 6}
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	a, b, c, maior is int;
+	nomecompletodoalunodeposgraduacao is string;
+
+start
+	read(a);
+	read(b);
+	read(c;
+
+	maior := 0;
+	if ( a>b and a>c ) then
+		maior := a;
+	else
+		if (b>c) then
+			maior := b;
+		else
+			maior := c;
+		end
+	end
+	
+	Out({Maior idade: });
+	out(maior);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+
+\subsection{Teste 7}
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	a, b, c is int;
+	result is int
+begin
+	in (a);
+	in (c);
+	b := 10;
+	result := (a * c)/(b + 5 - 345);
+	out(result);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+
+\subsection{Teste 8}
+
+Código fonte testado:
+\begin{lstlisting}[language=Pascal]
+var
+	a, b, c is int;
+	result is int
+begin
+	in (a);
+	in (c);
+	b := 10;
+	result := (a * c)/(b + 5 - 345);
+	out(result);
+end
+\end{lstlisting}
+	
+Saída encontrada:
+\begin{verbatim}
+	
+\end{verbatim}
+
+
+
+\end{document} 
