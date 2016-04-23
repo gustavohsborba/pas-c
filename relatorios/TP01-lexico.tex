@@ -401,15 +401,21 @@ Saída encontrada:
 Código fonte testado:
 \begin{lstlisting}[language=Pascal]
 var
-	a, b, c is int;
-	result is int
+    s, p is int;
+    var is int;
+
 begin
-	in (a);
-	in (c);
-	b := 10;
-	result := (a * c)/(b + 5 - 345);
-	out(result);
-end
+    s := 0;
+    
+    do
+        out({Preço? });
+        in(p);
+        s := s+p;
+    while p!=0;
+    
+    out({Total writeln a pagar: R$});
+    out(s);
+end.
 \end{lstlisting}
 	
 Saída encontrada:
@@ -425,15 +431,23 @@ Saída encontrada:
 Código fonte testado:
 \begin{lstlisting}[language=Pascal]
 var
-	a, b, c is int;
-	result is int
+    n, c, r is int;
+
 begin
-	in (a);
-	in (c);
-	b := 10;
-	result := (a * c)/(b + 5 - 345);
-	out(result);
-end
+    out({Digite um número: });
+    in(n);
+    
+    c:=1;
+    do
+        out(n);
+        out({ x });
+        out(c);
+        out({ = });
+        out(n*c);
+        out({\n});
+    while c !=10;
+
+end.
 \end{lstlisting}
 	
 Saída encontrada:
