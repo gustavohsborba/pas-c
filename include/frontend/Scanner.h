@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-#include "frontend/Token.h"
+#include "../frontend/Token.h"
 
 using std::istream;
 using std::ifstream;

@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "test/TestCase.h"
+#include "../include/test/TestCase.h"
 using std::endl;
 using std::string;
 using std::stringstream;

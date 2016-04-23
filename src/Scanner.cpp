@@ -1,6 +1,6 @@
-#include "frontend/Token.h"
-#include "frontend/TokenType.h"
-#include "frontend/Scanner.h"
+#include "../include/frontend/Token.h"
+#include "../include/frontend/TokenType.h"
+#include "../include/frontend/Scanner.h"
 
 #include <cstdio>
 #include <sstream>
@@ -38,15 +38,16 @@ Token Scanner::nextToken() {
 	while(peek() == ' ' || peek() == '\n' || peek() == '\t')
 		get();
 
-	if(isalpha(peek()))
+	if(isalpha(peek()) || peek() == '_')
 		return getLiteral();
 	else if(isdigit(peek()))
 		return getNumerical();
 	else if(peek() == '{')
 		return getString();
-	else
+	else if(peek() == EOF)
+		return Token(TOK_EOF);
+	else if(ispunct(peek()))
 		return getOperator();
-
 	return Token();
 }
 
@@ -95,7 +96,7 @@ Token Scanner::getOperator() {
 	} else if(peek() == ',') {
 		get();
 		op = Token(TOK_COMMA);
-	} else if(get() == ';') {
+	} else if(peek() == ';') {
 		get();
 		op = Token(TOK_SEMICOLON);
 	} else if(peek() == '+') {
@@ -116,6 +117,10 @@ Token Scanner::getOperator() {
 	} else if(peek() == ')') {
 		get();
 		op = Token(TOK_PAR_CLOSE);
+	} else {
+		string s = " ";
+		s[0] = get();
+		op=Token(TOK_UNKNOWN, s);
 	}
 
 	return op;
@@ -123,22 +128,23 @@ Token Scanner::getOperator() {
 
 
 Token Scanner::getLiteral() {
-	stringstream s;
+	stringstream ss;
 
 	while(isalnum(peek()) || peek() == '_') {
-		s << get();
+		ss << get();
 	}
 	
-
-	if(reservedWords.count(s.str())) {
-		return Token(reservedWords[s.str()]);
-	} else if(isalpha(s.str()[0]) && s.str().length() <= MAX_IDENTIFIER_SIZE) {
-		return Token(TOK_ID, s.str());
+	string s;
+	ss >> s;
+	if(reservedWords.count(s)) {
+		return Token(reservedWords[s]);
+	} else if(s.length() <= MAX_IDENTIFIER_SIZE) {
+		if(isalpha(s[0]))
+			return Token(TOK_ID, s);
+		else if(s[0] == '_' && s.length() > 1)
+			return Token(TOK_ID, s);
 	}
-
-
-
-	return Token();
+	return Token(TOK_UNKNOWN, s);
 }
 
 Token Scanner::getNumerical() {

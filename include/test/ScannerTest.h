@@ -4,9 +4,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "frontend/Scanner.h"
-#include "test/Assertions.h"
-#include "test/TestCase.h"
+#include "../frontend/Scanner.h"
+#include "../test/Assertions.h"
+#include "../test/TestCase.h"
 
 using std::fstream;
 using std::cout;

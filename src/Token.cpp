@@ -1,4 +1,4 @@
-#include "frontend/Token.h"
+#include "../include/frontend/Token.h"
 
 Token::~Token() {
 	value = "";
