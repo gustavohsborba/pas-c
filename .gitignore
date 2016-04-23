@@ -1,5 +1,8 @@
 pasc
+pas_c
+pas-c
 src/*~
 include/*~
 src/*.o
-
+.idea/*
+CMakeLists.txt
