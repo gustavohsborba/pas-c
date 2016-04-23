@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <sstream>
 #include <typeinfo>
+#include <algorithm>
 
 using std::stringstream;
 
@@ -130,7 +131,10 @@ Token Scanner::getOperator() {
 Token Scanner::getLiteral() {
 	stringstream ss;
 
-	while(isalnum(peek()) || peek() == '_') {
+	if(peek() == '_')
+		ss << get();
+
+	while(isalnum(peek())) {
 		ss << get();
 	}
 	

@@ -34,7 +34,9 @@ public:
 	}
 
 	friend ostream& operator<<(ostream& out, const Token& t) {
-		out << "(" << tok_name(t.getType()) << ", " << t.getValue() << ")";
+		out << "(" << tok_name(t.getType());
+		if(t.getValue() == "") out << ")";
+		else out << ", " << t.getValue() << ")";
 		return out;
 	}
 

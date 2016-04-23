@@ -2,7 +2,7 @@ var
     n, c, r is int;
 
 begin
-    out({Digite um número: });
+    out({Digite um numero: });
     in(n);
 
     c:=1;
