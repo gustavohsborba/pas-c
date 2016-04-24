@@ -1,13 +1,19 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "../include/test/TestCase.h"
-#include "../include/test/ScannerTest.h"
+#include "test/TestCase.h"
+#include "test/ScannerTest.h"
+#include "test/ScopeTest.h"
 
-#include "../include/frontend/Scanner.h"
+#include "frontend/Scanner.h"
 
 int main(int argc, char** argv) {
 	Scanner::init();
+
+#ifdef RUN_TESTS
+	TEST(Scanner)
+	TEST(Scope)
+#endif
 
 	fstream code;
 	code.open(argv[1]);
@@ -26,11 +32,6 @@ int main(int argc, char** argv) {
 		//sleep(1);
 	}
 
-
-
-//#ifdef RUN_TESTS
-//	TEST(Scanner)
-//#endif
 
 	return 0;
 }
