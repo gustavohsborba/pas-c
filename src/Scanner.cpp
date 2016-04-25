@@ -1,6 +1,9 @@
-#include "../include/frontend/Token.h"
-#include "../include/frontend/TokenType.h"
-#include "../include/frontend/Scanner.h"
+#include "frontend/Token.h"
+#include "frontend/TokenType.h"
+#include "frontend/Scanner.h"
+
+#include "exception/MalformedIdentifier.h"
+#include "exception/UnknownOperator.h"
 
 #include <cstdio>
 #include <sstream>
@@ -122,17 +125,21 @@ Token Scanner::getOperator() {
 		string s = " ";
 		s[0] = get();
 		op=Token(TOK_UNKNOWN, s);
+		throw UnknownOperator(op);
 	}
 
 	return op;
 }
 
-
 Token Scanner::getLiteral() {
 	stringstream ss;
 
-	if(peek() == '_')
+	if(peek() == '_' || isalpha(peek()) )
 		ss << get();
+	else{
+		ss << get();
+		throw MalformedIdentifier(Token(TOK_UNKNOWN, ss.str()), UNKNOWN_CHARACTER_SEQUENCE);
+	}
 
 	while(isalnum(peek())) {
 		ss << get();
@@ -142,12 +149,21 @@ Token Scanner::getLiteral() {
 	ss >> s;
 	if(reservedWords.count(s)) {
 		return Token(reservedWords[s]);
-	} else if(s.length() <= MAX_IDENTIFIER_SIZE) {
+	} else {
+		Token t;
 		if(isalpha(s[0]))
-			return Token(TOK_ID, s);
+			t = Token(TOK_ID, s);
 		else if(s[0] == '_' && s.length() > 1)
-			return Token(TOK_ID, s);
+			t = Token(TOK_ID, s);
+
+		if(s.length() > MAX_IDENTIFIER_SIZE)
+			throw MalformedIdentifier(t, IDENTIFIER_EXCEEDED_SIZE);
+		if((s[0] == '_' && s.length() == 1))
+			throw MalformedIdentifier(t, UNKNOWN_CHARACTER_SEQUENCE);
+
+		return t;
 	}
+
 	return Token(TOK_UNKNOWN, s);
 }
 
@@ -168,6 +184,7 @@ Token Scanner::getNumerical() {
 }
 
 Token Scanner::getString() {
+
 	stringstream s;
 
 	if(peek() == '{') {

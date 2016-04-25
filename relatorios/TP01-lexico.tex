@@ -3,17 +3,15 @@
 \usepackage[brazil]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage{multirow}
-\usepackage{subfigure}
-\usepackage{a4wide}
+%\usepackage{subfigure}
+%\usepackage{a4wide}
 \usepackage{fancyhdr}
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{tikz}
 \usepackage{empheq}
 \usetikzlibrary{trees}
-\usepackage{multirow}
-\usepackage{subfigure}
+%\usepackage{multirow}
 \usepackage{amssymb,amsmath}
 \usepackage{amsthm,amsfonts}
 \usepackage{float}
@@ -162,14 +160,14 @@ make
 		
 		Esse comando deverá gerar a seguinte seqûencia de comandos:
 \begin{lstlisting}[language=C++]
-g++ -Iinclude -c -Wall -g -DRUN_TESTS src/Scanner.cpp -o src/Scanner.o
-g++ -Iinclude -c -Wall -g -DRUN_TESTS src/TestCase.cpp -o src/TestCase.o
-g++ -Iinclude -c -Wall -g -DRUN_TESTS src/Token.cpp -o src/Token.o
-g++ -Iinclude -c -Wall -g -DRUN_TESTS src/main.cpp -o src/main.o
+g++ -Iinclude -c -Wall -g src/Scanner.cpp -o src/Scanner.o
+g++ -Iinclude -c -Wall -g src/TestCase.cpp -o src/TestCase.o
+g++ -Iinclude -c -Wall -g src/Token.cpp -o src/Token.o
+g++ -Iinclude -c -Wall -g src/main.cpp -o src/main.o
 g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 \end{lstlisting}
 		
-		Pronto! Agora o executável \textbf{pasc} está pronto para compilar seus programas em Pas-c!
+		Isso deve gerar um arquivo executavel \textbf{pasc} que compilará arquivos com extensão \verb .pasc . 
 	
 	
 	\subsection{Compilando um programa em Pas-c}
@@ -186,7 +184,9 @@ g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 	
 	\subsection{A abordagem utilizada na implementação}
 		
-		O compilador \textbf{pas-c} utiliza um analisador léxico recursivo, \textbf{e quem vai saber explicar essas parada toda é o japão}, eu nem estudei pra segunda prova ainda. 
+		O analisador léxico da foi implementado na classe \verb Scanner e analisa caractere por caractere do arquivo fonte
+		procurando casar os caracteres acumulados com o padrão de formação de um Token. Dentro da classe \verb Scanner existe
+		uma tabela que contem as palavras reservadas da linguagem.
 		
 	\subsection{A Estrutura do Projeto}
 		
@@ -213,7 +213,10 @@ g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 			\item \textbf{TokenType: } TokenType trata-se apenas de um enum, que define, através de um bitmap, a lista de tokens reconhecidos pelo compilador, bem como um tipo UNKNOWN, para todo e qualquer token que não corresponder a nenhuma definição da linguagem.
 			
 			\item \textbf{Scanner: } O analisador léxico está concentrado basicamente na classe Scanner. Essa classe contém os métodos \textbf{getNumerical}, \textbf{getLiteral} e \textbf{getOperator}, que são responsáveis por captar os tokens, bem como o método \textbf{getString}. Este último é necessário por que uma vez que se abre um caracter delimitador de string, espacos em brancos passam a ser caracteres significativos. Também estão definidos nessa classe os contadores de linhas e colunas do código-fonte.
-		
+			
+			\item \textbf{Scope: } Tabela de símbolos do compilador
+			
+			\item \textbf{Symbol: } Classe abstrata que representará simbolos da linguagem
 		\end{itemize}
 		
 

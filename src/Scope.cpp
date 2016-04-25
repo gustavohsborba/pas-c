@@ -1,3 +1,4 @@
+#include "exception/SymbolAlreadyInstalled.h"
 #include "exception/SymbolNotFound.h"
 #include "frontend/Scope.h"
 
@@ -22,6 +23,9 @@ Scope* Scope::close() {
 }
 
 void Scope::addSymbol(Token tok, Symbol* sym){
+	if(table.count(tok))
+		throw SymbolAlreadyInstalled(tok, *table[tok]);
+	
 	table[tok] = sym;
 }
 
