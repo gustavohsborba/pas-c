@@ -148,7 +148,7 @@ caractere ::= um dos 256 caracteres do conjunto ASCII,
 		\end{lstlisting}
 
 \newpage
-\section{Uso do compilaodor}
+\section{Uso do compilador}
 
 	
 	\subsection{Compilando o Compilador Pas-c}
@@ -169,7 +169,7 @@ g++ -Iinclude -c -Wall -g -DRUN_TESTS src/main.cpp -o src/main.o
 g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 \end{lstlisting}
 		
-		Pronto! Agora o executável \textbf{pasc} está pronto para compilar seus programas em Pas-c!
+	Pronto! Agora o executável \textbf{pasc} está pronto para compilar seus programas em Pas-c!
 	
 	
 	\subsection{Compilando um programa em Pas-c}
@@ -186,7 +186,6 @@ g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 	
 	\subsection{A abordagem utilizada na implementação}
 		
-		O compilador \textbf{pas-c} utiliza um analisador léxico recursivo, \textbf{e quem vai saber explicar essas parada toda é o japão}, eu nem estudei pra segunda prova ainda. 
 		
 	\subsection{A Estrutura do Projeto}
 		
@@ -213,12 +212,17 @@ g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 			\item \textbf{TokenType: } TokenType trata-se apenas de um enum, que define, através de um bitmap, a lista de tokens reconhecidos pelo compilador, bem como um tipo UNKNOWN, para todo e qualquer token que não corresponder a nenhuma definição da linguagem.
 			
 			\item \textbf{Scanner: } O analisador léxico está concentrado basicamente na classe Scanner. Essa classe contém os métodos \textbf{getNumerical}, \textbf{getLiteral} e \textbf{getOperator}, que são responsáveis por captar os tokens, bem como o método \textbf{getString}. Este último é necessário por que uma vez que se abre um caracter delimitador de string, espacos em brancos passam a ser caracteres significativos. Também estão definidos nessa classe os contadores de linhas e colunas do código-fonte.
+			
+			\item \textbf{Scope: } É a classe que definie o escopo de uma variável. Cada instância de Scope contém uma tabela com os símbolos daquele escopo e um ponteiro para seu "escopo pai". 
 		
 		\end{itemize}
 		
 
 \newpage
 \section{Resultados dos testes especificados}
+
+	Os testes aqui realizados não exibem a tabela de símbolos: Esta é responsabilidade do analizador Sintático, que será realizado na próxima etapa.
+	Nosso projeto tem uma classe Scope, justamente para compreender essa situação, que ainda não está preparada.
 
 
 	\subsection{Teste 1}
@@ -265,7 +269,7 @@ g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 		Saída encontrada:
 		\lstinputlisting{../tests/output/test5.out}
 
-
+	\newpage
 	\subsection{Teste 6}
 	
 		Código fonte testado:
@@ -274,7 +278,7 @@ g++  src/Scanner.o src/TestCase.o src/Token.o src/main.o -o pasc
 		Saída encontrada:
 		\lstinputlisting{../tests/output/test6.out}
 
-
+	\newpage
 	\subsection{Teste 7}
 	
 		Código fonte testado:
