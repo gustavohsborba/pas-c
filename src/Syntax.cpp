@@ -61,10 +61,14 @@ void Syntax::findProgram(){
     findStmtLst();
     matchToken(TOK_END);
 }
+
 void Syntax::findDeclList(){
     findDecl();
     matchToken(TOK_SEMICOLON);
-    while()
+    while(!checkToken(TOK_BEGIN)){
+        findDecl();
+        matchToken(TOK_SEMICOLON);
+    }
 }
 
 void Syntax::findDecl(){
@@ -85,8 +89,36 @@ void Syntax::findType(){
     matchToken(TOK_INT | TOK_STRING);
 }
 
-void Syntax::findStmtLst();
-void Syntax::findStmt();
+void Syntax::findStmtLst(){
+    findStmt();
+    matchToken(TOK_SEMICOLON);
+    while(!checkToken(TOK_END | TOK_WHILE | TOK_ELSE)){
+        findStmt();
+        matchToken(TOK_SEMICOLON);
+    }
+}
+
+void Syntax::findStmt(){
+    switch (tok.getType()){
+        case TOK_ID:
+            findAssignStmt();
+            break;
+        case TOK_IF:
+            findIfStmt();
+            break;
+        case TOK_DO:
+            findDoWhileStmt();
+            break;
+        case TOK_IN:
+            findReadStmt();
+            break;
+        case TOK_OUT:
+            findWriteStmt();
+            break;
+        default:
+            error();
+    }
+}
 
 void Syntax::findAssignStmt(){
     matchToken(TOK_ID);
@@ -125,6 +157,7 @@ void Syntax::findWriteStmt(){
     findSimpleExpr();
     matchToken(TOK_PAR_CLOSE);
 }
+
 void Syntax::findExpression();
 void Syntax::findSimpleExpr();
 void Syntax::findTerm();
@@ -150,6 +183,7 @@ void Syntax::findFactor(){
 }
 
 
+// ---------- Just-One-Token Methods:
 void Syntax::findRelop(){
     matchToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE);
 }
@@ -162,8 +196,6 @@ void Syntax::findMulop(){
     matchToken(TOK_MULT | TOK_AND | TOK_DIV);
 }
 
-
-// ---------- Just-One-Token Methods:
 void Syntax::findConstant(){
     matchToken(TOK_CONST_INT | TOK_CONST_STR);
 }
@@ -178,20 +210,4 @@ void Syntax::findLiteral(){
 
 void Syntax::findIdentifier(){
     matchToken(TOK_ID);
-}
-
-
-
-// ---------- Unnecessary methods:
-void Syntax::findLetter(){
-
-}
-void Syntax::findDigit(){
-
-}
-void Syntax::findNonzero(){
-
-}
-void Syntax::findChar(){
-
 }

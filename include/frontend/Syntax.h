@@ -56,10 +56,6 @@ private:
     void findIntegerConst();
     void findLiteral();
     void findIdentifier();
-    void findLetter();
-    void findDigit();
-    void findNonzero();
-    void findChar();
 
     void error();
     void error(long tok);
