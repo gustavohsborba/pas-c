@@ -1,5 +1,5 @@
 //
-// Created by gustavo on 15/05/16.
+// Crmatched by gustavo on 15/05/16.
 //
 
 #include "../include/frontend/Syntax.h"
@@ -17,7 +17,11 @@ void Syntax::analyse(){
 
 // ---------- Token Consumer methods:
 
-void Syntax::eatToken(TokenType t){
+inline bool Syntax::checkToken(long t) {
+    return  tok.getType() & t;
+}
+
+void Syntax::matchToken(long t){
     if (tok.getType() & t) advance();
     else error(t, tok);
 }
@@ -48,88 +52,146 @@ void Syntax::advance(){
 
 // ---------- Non-Terminal consumer methods:
 
-void Syntax::procProgram();
-void Syntax::procDeclList();
-void Syntax::procDecl();
-void Syntax::procIdentList();
-void Syntax::procType();
-void Syntax::procStmtLst();
-void Syntax::procStmt();
-void Syntax::procAssignStmt();
-void Syntax::procIfStmt();
-void Syntax::procCondition();
-void Syntax::procDoStmt();
-void Syntax::procStmtSuffix();
-void Syntax::procReadStmt();
-void Syntax::procWriteStmt();
-void Syntax::procWritable();
-void Syntax::procExpression();
-void Syntax::procSimpleExpr();
-void Syntax::procTerm();
+void Syntax::findProgram(){
+    if(checkToken(TOK_VAR)){
+        matchToken(TOK_VAR);
+        findDeclList();
+    }
+    matchToken(TOK_BEGIN);
+    findStmtLst();
+    matchToken(TOK_END);
+}
+void Syntax::findDeclList(){
+    findDecl();
+    matchToken(TOK_SEMICOLON);
+    while()
+}
 
-void Syntax::procFactorA(){
-    if(tok == TOK_NOT){
-        eatToken(TOK_NOT);
-        procFactor();
-    } else if (tok == TOK_SUB){
-        eatToken(TOK_SUB);
-        procFactor();
-    } else procFactor();
+void Syntax::findDecl(){
+    findIdentList();
+    matchToken(TOK_IS);
+    findType();
+}
+
+void Syntax::findIdentList(){
+    matchToken(TOK_ID);
+    while(checkToken(TOK_COMMA)){
+        matchToken(TOK_COMMA);
+        matchToken(TOK_ID);
+    }
+}
+
+void Syntax::findType(){
+    matchToken(TOK_INT | TOK_STRING);
+}
+
+void Syntax::findStmtLst();
+void Syntax::findStmt();
+
+void Syntax::findAssignStmt(){
+    matchToken(TOK_ID);
+    matchToken(TOK_ASSIGN);
+    findSimpleExpr();
+}
+
+void Syntax::findIfStmt(){
+    matchToken(TOK_IF);
+    findExpression();
+    matchToken(TOK_THEN);
+    findStmtLst();
+    if(checkToken(TOK_ELSE)){
+        matchToken(TOK_ELSE);
+        findStmtLst();
+    }
+    matchToken(TOK_END);
+}
+
+void Syntax::findDoWhileStmt(){
+    matchToken(TOK_DO);
+    findStmtLst();
+    matchToken(TOK_WHILE);
+    findExpression();
+}
+
+void Syntax::findReadStmt(){
+    matchToken(TOK_IN);
+    matchToken(TOK_PAR_OPEN);
+    matchToken(TOK_ID);
+    matchToken(TOK_PAR_CLOSE);
+}
+void Syntax::findWriteStmt(){
+    matchToken(TOK_OUT);
+    matchToken(TOK_PAR_OPEN);
+    findSimpleExpr();
+    matchToken(TOK_PAR_CLOSE);
+}
+void Syntax::findExpression();
+void Syntax::findSimpleExpr();
+void Syntax::findTerm();
+
+void Syntax::findFactorA(){
+    if(checkToken(TOK_NOT)){
+        matchToken(TOK_NOT);
+        findFactor();
+    } else if (checkToken(TOK_SUB)){
+        matchToken(TOK_SUB);
+        findFactor();
+    } else findFactor();
 }
 
 
-void Syntax::procFactor(){
-    if(tok==TOK_PAR_OPEN) {
-        eatToken(TOK_PAR_OPEN);
-        procExpression();
-        eatToken(TOK_PAR_CLOSE);
-    } else eatToken(TOK_ID | TOK_CONST_STR | TOK_CONST_INT);
+void Syntax::findFactor(){
+    if(checkToken(TOK_PAR_OPEN)) {
+        matchToken(TOK_PAR_OPEN);
+        findExpression();
+        matchToken(TOK_PAR_CLOSE);
+    } else matchToken(TOK_ID | TOK_CONST_STR | TOK_CONST_INT);
 
 }
 
 
-void Syntax::procRelop(){
-    eatToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE);
+void Syntax::findRelop(){
+    matchToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE);
 }
 
-void Syntax::procAddop(){
-    eatToken(TOK_ADD | TOK_SUB | TOK_OR);
+void Syntax::findAddop(){
+    matchToken(TOK_ADD | TOK_SUB | TOK_OR);
 }
 
-void Syntax::procMulop(){
-    eatToken(TOK_MULT | TOK_AND | TOK_DIV);
+void Syntax::findMulop(){
+    matchToken(TOK_MULT | TOK_AND | TOK_DIV);
 }
 
 
 // ---------- Just-One-Token Methods:
-void Syntax::procConstant(){
-    eatToken(TOK_CONST_INT | TOK_CONST_STR);
+void Syntax::findConstant(){
+    matchToken(TOK_CONST_INT | TOK_CONST_STR);
 }
 
-void Syntax::procIntegerConst(){
-    eatToken(TOK_CONST_INT);
+void Syntax::findIntegerConst(){
+    matchToken(TOK_CONST_INT);
 }
 
-void Syntax::procLiteral(){
-    eatToken(TOK_LT);
+void Syntax::findLiteral(){
+    matchToken(TOK_LT);
 }
 
-void Syntax::procIdentifier(){
-    eatToken(TOK_ID);
+void Syntax::findIdentifier(){
+    matchToken(TOK_ID);
 }
 
 
 
 // ---------- Unnecessary methods:
-void Syntax::procLetter(){
+void Syntax::findLetter(){
 
 }
-void Syntax::procDigit(){
+void Syntax::findDigit(){
 
 }
-void Syntax::procNonzero(){
+void Syntax::findNonzero(){
 
 }
-void Syntax::procChar(){
+void Syntax::findChar(){
 
 }
