@@ -18,9 +18,29 @@ void Syntax::analyse(){
 // ---------- Token Consumer methods:
 
 void Syntax::eatToken(TokenType t){
-    if (tok==t) advance();
+    if (tok.getType() & t) advance();
     else error(t, tok);
 }
+
+/*    else {
+        list<TokenType> tokens = listTokens(t);
+
+        stringstream errorbuf;
+
+        errorbuf << "Syntax error on line " << (parser->getLines()+1) << ":"
+        << (parser->getColumns()+1) << ": Expected ";
+
+
+        for(list<TokenType>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+            errorbuf << token_name(*it) + ", ";
+        }
+
+        errorbuf << "but found " << token_name(lexeme.type) << " ("  << lexeme.token << ")";
+
+        throw errorbuf.str();
+    }
+*/
+
 void Syntax::advance(){
     tok = scanner->nextToken(); //lê próximo token
 }
@@ -46,43 +66,44 @@ void Syntax::procWritable();
 void Syntax::procExpression();
 void Syntax::procSimpleExpr();
 void Syntax::procTerm();
-void Syntax::procFactorA();
-void Syntax::procFactor();
+
+void Syntax::procFactorA(){
+    if(tok == TOK_NOT){
+        eatToken(TOK_NOT);
+        procFactor();
+    } else if (tok == TOK_SUB){
+        eatToken(TOK_SUB);
+        procFactor();
+    } else procFactor();
+}
+
+
+void Syntax::procFactor(){
+    if(tok==TOK_PAR_OPEN) {
+        eatToken(TOK_PAR_OPEN);
+        procExpression();
+        eatToken(TOK_PAR_CLOSE);
+    } else eatToken(TOK_ID | TOK_CONST_STR | TOK_CONST_INT);
+
+}
 
 
 void Syntax::procRelop(){
-    if(tok == TOK_EQUALS)
-        eatToken(TOK_EQUALS);
+    eatToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE);
 }
 
 void Syntax::procAddop(){
-    if(tok == TOK_ADD)
-        eatToken(TOK_ADD);
-    else if(tok == TOK_SUB)
-        eatToken(TOK_SUB);
-    else if(tok == TOK_OR)
-        eatToken(TOK_OR);
-    else error();
+    eatToken(TOK_ADD | TOK_SUB | TOK_OR);
 }
 
 void Syntax::procMulop(){
-    if(tok == TOK_MULT)
-        eatToken(TOK_MULT);
-    else if(tok == TOK_AND)
-        eatToken(TOK_AND);
-    else if(tok == TOK_DIV)
-        eatToken(TOK_DIV);
-    else error();
+    eatToken(TOK_MULT | TOK_AND | TOK_DIV);
 }
 
 
 // ---------- Just-One-Token Methods:
 void Syntax::procConstant(){
-    if(tok == TOK_CONST_INT)
-        procIntegerConst();
-    else if (tok == TOK_CONST_STR)
-        eatToken(TOK_CONST_STR);
-    else error();
+    eatToken(TOK_CONST_INT | TOK_CONST_STR);
 }
 
 void Syntax::procIntegerConst(){
