@@ -2,8 +2,8 @@
 // Created by gustavo on 15/05/16.
 //
 
-#ifndef PAS_C_SYNTAX_H
-#define PAS_C_SYNTAX_H
+#ifndef _SYNTAX_H
+#define _SYNTAX_H
 
 
 #include "Token.h"
@@ -13,14 +13,27 @@
 using std::string;
 using std::exception;
 
+/// Test class declaration
+class SyntaxTest;
+
+/**
+ * \brief Parser class, should identify valid language constructions and return an syntactic-tree
+ */
 class Syntax {
 
 public:
+    /**
+     * \brief construct a valid parser and get the first token
+     */
     Syntax(Scanner* s) : scanner(s){
+        advance();
     }
 
     ~Syntax() {}
 
+    /**
+     * \brief Analyse a program
+     */
     void analyse();
 
 private:
@@ -28,9 +41,9 @@ private:
     Scanner* scanner;
     Token tok;
 
-    void matchToken(long t);
+    inline void matchToken(long t);
     inline bool checkToken(long t);
-    void advance();
+    inline void advance();
 
     void findProgram();
     void findDeclList();
@@ -60,6 +73,9 @@ private:
     void error();
     void error(long tok);
     void error(long t, Token tok);
+
+    /// it's a friend class because we need to test the private methods
+    friend class SyntaxTest;
 };
 
 

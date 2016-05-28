@@ -2,18 +2,15 @@
 // Crmatched by gustavo on 15/05/16.
 //
 
-#include "../include/frontend/Syntax.h"
-#include "../include/frontend/Scanner.h"
-#include "../include/frontend/Token.h"
-#include "../include/frontend/TokenType.h"
-
-Scanner* Syntax::scanner;
-Token Syntax::tok;
+#include "frontend/Syntax.h"
+#include "frontend/Scanner.h"
+#include "frontend/Token.h"
+#include "frontend/TokenType.h"
+#include "exception/SyntaxError.h"
 
 void Syntax::analyse(){
-
+    findProgram();
 }
-
 
 // ---------- Token Consumer methods:
 
@@ -21,34 +18,23 @@ inline bool Syntax::checkToken(long t) {
     return  tok.getType() & t;
 }
 
-void Syntax::matchToken(long t){
+inline void Syntax::matchToken(long t){
     if (tok.getType() & t) advance();
     else error(t, tok);
 }
 
-/*    else {
-        list<TokenType> tokens = listTokens(t);
-
-        stringstream errorbuf;
-
-        errorbuf << "Syntax error on line " << (parser->getLines()+1) << ":"
-        << (parser->getColumns()+1) << ": Expected ";
-
-
-        for(list<TokenType>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
-            errorbuf << token_name(*it) + ", ";
-        }
-
-        errorbuf << "but found " << token_name(lexeme.type) << " ("  << lexeme.token << ")";
-
-        throw errorbuf.str();
-    }
-*/
-
-void Syntax::advance(){
+inline void Syntax::advance(){
     tok = scanner->nextToken(); //lê próximo token
 }
 
+
+void Syntax::error(long t, Token tok) {
+    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount());
+}
+
+void Syntax::error() {
+    error(0, Token());
+}
 
 // ---------- Non-Terminal consumer methods:
 
@@ -158,9 +144,31 @@ void Syntax::findWriteStmt(){
     matchToken(TOK_PAR_CLOSE);
 }
 
-void Syntax::findExpression();
-void Syntax::findSimpleExpr();
-void Syntax::findTerm();
+void Syntax::findExpression() {
+    findSimpleExpr();
+
+    if(checkToken(TOK_EQUALS)) {
+        matchToken(TOK_EQUALS);
+        findSimpleExpr();
+    }
+}
+void Syntax::findSimpleExpr() {
+    findTerm();
+
+    if(checkToken(TOK_SUB | TOK_ADD | TOK_OR)) {
+        matchToken(TOK_SUB | TOK_ADD | TOK_OR);
+        findSimpleExpr();
+    }
+}
+
+void Syntax::findTerm() {
+    findFactorA();
+
+    if(checkToken(TOK_DIV | TOK_MULT | TOK_AND)) {
+        matchToken(TOK_DIV | TOK_MULT | TOK_AND);
+        findTerm();
+    }
+}
 
 void Syntax::findFactorA(){
     if(checkToken(TOK_NOT)){

@@ -15,11 +15,11 @@
 #define SHOULD_FAIL(x,exception_t, succ) try{  \
 	(x); \
 	incFail(); std::cerr << "[FAIL] " << #x << " should fail in "<< __FILE__ << ":" << __LINE__ << std::endl; } \
-	catch (exception_t _ex_) { incPass(); (succ); }
+	catch (exception_t& _ex_) { incPass(); (succ); }
 
 #define SHOULD_PASS(x, succ) try{ \
 	(x); \
 	incPass(); (succ);\
-	} catch (std::exception& _ex_) {incFail(); std::cerr << "[FAIL] " << #x << " thrown " << _ex_.what() << " in " << __FILE__ << ":" << __LINE__ << endl; }
+	} catch (std::exception& _ex_) {incFail(); std::cerr << "[FAIL] " << #x << " thrown " << _ex_.what() << " in " << __FILE__ << ":" << __LINE__ << std::endl; }
 
 #endif
