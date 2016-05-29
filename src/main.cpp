@@ -6,6 +6,7 @@
 #include "test/ScannerTest.h"
 #include "test/ScopeTest.h"
 #include "test/SyntaxTest.h"
+#include "test/TokenTypeTest.h"
 
 #include "exception/MalformedIdentifier.h"
 #include "exception/UnknownOperator.h"
@@ -25,6 +26,7 @@ int main(int argc, char** argv) {
 	TEST(Scanner)
 	TEST(Scope)
 	TEST(Syntax)
+	TEST(TokenType)
 #endif
 
 	fstream code;

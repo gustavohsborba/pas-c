@@ -12,6 +12,6 @@ set(SOURCE_FILES
         src/Symbol.cpp
         src/Syntax.cpp
         src/TestCase.cpp
-        src/Token.cpp)
+        src/Token.cpp src/TokenType.cpp include/test/TokenTypeTest.h)
 
 add_executable(pas_c ${SOURCE_FILES})

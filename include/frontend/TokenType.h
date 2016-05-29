@@ -3,8 +3,10 @@
 
 #include <string>
 #include <cmath>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 #define bit(i) (1L<<i)
 #define tok_no(i) ((long)log2(i))
@@ -95,5 +97,11 @@ const string TOKEN_NAME [] = {
 };
 
 #define tok_name(t) (TOKEN_NAME[tok_no(t)])
+
+/**
+ * \brief get a bitmask of TokenTypes and return a list of all TokenTypes separated
+ *
+ */
+vector<TokenType> unmask(long mask);
 
 #endif
