@@ -9,6 +9,8 @@
 #include "Token.h"
 #include "TokenType.h"
 #include "Scanner.h"
+#include "Scope.h"
+#include "Symbol.h"
 
 using std::string;
 using std::exception;
@@ -26,6 +28,7 @@ public:
      * \brief construct a valid parser and get the first token
      */
     Syntax(Scanner* s) : scanner(s){
+        scope = new Scope();
         advance();
     }
 
@@ -38,12 +41,22 @@ public:
 
 private:
 
-    Scanner* scanner;
     Token tok;
+    Scanner* scanner;
+    Scope* scope;
 
-    inline void matchToken(long t);
-    inline bool checkToken(long t);
-    inline void advance();
+    inline bool checkToken(long t) {
+        return  tok.getType() & t;
+    }
+
+    inline void matchToken(long t){
+        if (tok.getType() & t) advance();
+        else error(t, tok);
+    }
+
+    inline void advance(){
+        tok = scanner->nextToken(); //lê próximo token
+    }
 
     void findProgram();
     void findDeclList();

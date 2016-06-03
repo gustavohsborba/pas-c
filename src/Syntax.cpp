@@ -14,21 +14,10 @@ void Syntax::analyse(){
 
 // ---------- Token Consumer methods:
 
-inline bool Syntax::checkToken(long t) {
-    return  tok.getType() & t;
-}
-
-inline void Syntax::matchToken(long t){
-    if (tok.getType() & t) advance();
-    else error(t, tok);
-}
-
-inline void Syntax::advance(){
-    tok = scanner->nextToken(); //lê próximo token
-}
-
 
 void Syntax::error(long t, Token tok) {
+    //vector<TokenType> expected = unmask(t);
+
     throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount());
 }
 
@@ -64,12 +53,20 @@ void Syntax::findDecl(){
 }
 
 void Syntax::findIdentList(){
-    matchToken(TOK_ID);
-    while(checkToken(TOK_COMMA)){
-        matchToken(TOK_COMMA);
+    if(checkToken(TOK_ID)) {
+        scope->addSymbol(this->tok, new Symbol());
         matchToken(TOK_ID);
     }
-}
+
+    while(checkToken(TOK_COMMA)){
+        matchToken(TOK_COMMA);
+     
+        if(checkToken(TOK_ID)) {
+            scope->addSymbol(this->tok, new Symbol());
+            matchToken(TOK_ID);
+        }
+    }
+ }
 
 void Syntax::findType(){
     matchToken(TOK_INT | TOK_STRING);
@@ -107,6 +104,8 @@ void Syntax::findStmt(){
 }
 
 void Syntax::findAssignStmt(){
+    Symbol *symbol = scope->find(this->tok);
+
     matchToken(TOK_ID);
     matchToken(TOK_ASSIGN);
     findSimpleExpr();
@@ -134,6 +133,11 @@ void Syntax::findDoWhileStmt(){
 void Syntax::findReadStmt(){
     matchToken(TOK_IN);
     matchToken(TOK_PAR_OPEN);
+
+    if(checkToken(TOK_ID)) {
+        scope->find(this->tok);
+    }
+
     matchToken(TOK_ID);
     matchToken(TOK_PAR_CLOSE);
 }
@@ -180,16 +184,17 @@ void Syntax::findFactorA(){
     } else findFactor();
 }
 
-
 void Syntax::findFactor(){
     if(checkToken(TOK_PAR_OPEN)) {
         matchToken(TOK_PAR_OPEN);
         findExpression();
         matchToken(TOK_PAR_CLOSE);
-    } else matchToken(TOK_ID | TOK_CONST_STR | TOK_CONST_INT);
+    } else if (checkToken(TOK_ID)) {
+        scope->find(this->tok);
+        matchToken(TOK_ID);
+    } else matchToken(TOK_CONST_STR | TOK_CONST_INT);
 
 }
-
 
 // ---------- Just-One-Token Methods:
 void Syntax::findRelop(){

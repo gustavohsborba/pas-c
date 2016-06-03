@@ -4,6 +4,7 @@ var
 begin
     out({Digite um numero: });
     in(n);
+    b = 10;
 
     c:=1;
     do
