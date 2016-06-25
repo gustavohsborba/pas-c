@@ -7,13 +7,18 @@
 
 using std::set;
 
+typedef enum ExprType {
+	EXPR_INT,
+	EXPR_STR
+}ExprType;
+
 class Statement {
 public:
 	Statement(CodeGenerator* generator) : generator(generator) {
 
 	}
 
-	virtual ~Statement() = 0;
+	~Statement() {}
 
 	virtual void emmit() = 0;
 
@@ -52,7 +57,8 @@ public:
 		Statement::Statement(generator);
 	}
 
-	
+protected:
+	ExprType type;
 };
 
 #endif

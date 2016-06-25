@@ -12,6 +12,8 @@
 #include "Scope.h"
 #include "Symbol.h"
 
+#include "backend/CodeGenerator.h"
+
 using std::string;
 using std::exception;
 
@@ -29,6 +31,7 @@ public:
      */
     Syntax(Scanner* s) : scanner(s){
         scope = new Scope();
+        gen = NULL;
         advance();
     }
 
@@ -44,6 +47,7 @@ private:
     Token tok;
     Scanner* scanner;
     Scope* scope;
+    CodeGenerator* gen;
 
     inline bool checkToken(long t) {
         return  tok.getType() & t;
@@ -74,7 +78,7 @@ private:
     void findSimpleExpr();
     void findTerm();
     void findFactorA();
-    void findFactor();
+    Expression* findFactor();
     void findRelop();
     void findAddop();
     void findMulop();
