@@ -14,6 +14,8 @@ void Syntax::analyse(){
 
 // ---------- Token Consumer methods:
 
+
+
 void Syntax::error(long t, Token tok) {
     //vector<TokenType> expected = unmask(t);
 
@@ -52,10 +54,18 @@ void Syntax::findDecl(){
 }
 
 void Syntax::findIdentList(){
-    matchToken(TOK_ID);
+    if(checkToken(TOK_ID)) {
+        scope->addSymbol(this->tok, new Symbol());
+        matchToken(TOK_ID);
+    }
+
     while(checkToken(TOK_COMMA)){
         matchToken(TOK_COMMA);
-        matchToken(TOK_ID);
+     
+        if(checkToken(TOK_ID)) {
+            scope->addSymbol(this->tok, new Symbol());
+            matchToken(TOK_ID);
+        }
     }
 }
 
@@ -95,6 +105,8 @@ void Syntax::findStmt(){
 }
 
 void Syntax::findAssignStmt(){
+    Symbol *symbol = scope->find(this->tok);
+
     matchToken(TOK_ID);
     matchToken(TOK_ASSIGN);
     findSimpleExpr();
@@ -122,6 +134,11 @@ void Syntax::findDoWhileStmt(){
 void Syntax::findReadStmt(){
     matchToken(TOK_IN);
     matchToken(TOK_PAR_OPEN);
+
+    if(checkToken(TOK_ID)) {
+        scope->find(this->tok);
+    }
+
     matchToken(TOK_ID);
     matchToken(TOK_PAR_CLOSE);
 }
@@ -140,13 +157,24 @@ void Syntax::findExpression() {
         findSimpleExpr();
     }
 }
-void Syntax::findSimpleExpr() {
-    findTerm();
+Expression* Syntax::findSimpleExpr() {
+    Expression* t1 = findTerm();
 
     if(checkToken(TOK_SUB | TOK_ADD | TOK_OR)) {
+        Token op = this->tok;
         matchToken(TOK_SUB | TOK_ADD | TOK_OR);
-        findSimpleExpr();
+        Expression t2 = findSimpleExpr();
+    } else return t1;
+
+    Expression *expr = NULL;
+
+    switch(op->getType()) {
+        case TOK_ADD:
+            expr = new AddExpr(gen, t1, t2);
+            break;
     }
+
+    return expr;
 }
 
 void Syntax::findTerm() {
@@ -169,13 +197,25 @@ void Syntax::findFactorA(){
 }
 
 
-void Syntax::findFactor(){
+Expression* Syntax::findFactor(){
     if(checkToken(TOK_PAR_OPEN)) {
         matchToken(TOK_PAR_OPEN);
         findExpression();
         matchToken(TOK_PAR_CLOSE);
-    } else matchToken(TOK_ID | TOK_CONST_STR | TOK_CONST_INT);
+    } else {
 
+        Expression *expr = NULL;
+        if (checkToken(TOK_ID)) 
+            expr = new VarExpr(gen, scope->find(tok));
+        else if (checkToken(TOK_CONST_INT))
+            expr = new IntExpr(gen, toInt(tok));
+        else if (checkToken(TOK_CONST_STR))
+            expr = new StrExpr(gen, toString(tok));
+
+        matchToken(TOK_ID | TOK_CONST_INT | TOK_CONST_STR);
+
+        return expr;
+    }
 }
 
 
