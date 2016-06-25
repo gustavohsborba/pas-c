@@ -1,6 +1,8 @@
-#include "exception/SymbolAlreadyInstalled.h"
-#include "exception/SymbolNotFound.h"
-#include "frontend/Scope.h"
+#include "../include/exception/SymbolAlreadyInstalled.h"
+#include "../include/exception/SymbolNotFound.h"
+#include "../include/frontend/Scope.h"
+#include "../include/frontend/Symbol.h"
+#include "../include/frontend/Token.h"
 
 Scope::~Scope() {
 	for (scope_it it = table.begin(); it != table.end(); ++it) {

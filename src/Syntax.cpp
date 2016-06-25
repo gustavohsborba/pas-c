@@ -2,11 +2,11 @@
 // Crmatched by gustavo on 15/05/16.
 //
 
-#include "frontend/Syntax.h"
-#include "frontend/Scanner.h"
-#include "frontend/Token.h"
-#include "frontend/TokenType.h"
-#include "exception/SyntaxError.h"
+#include "../include/frontend/Syntax.h"
+#include "../include/frontend/Scanner.h"
+#include "../include/frontend/Token.h"
+#include "../include/frontend/TokenType.h"
+#include "../include/exception/SyntaxError.h"
 
 void Syntax::analyse(){
     findProgram();
@@ -29,7 +29,7 @@ inline void Syntax::advance(){
 
 
 void Syntax::error(long t, Token tok) {
-    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount());
+    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount(), tok);
 }
 
 void Syntax::error() {

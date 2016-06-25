@@ -1,9 +1,9 @@
-#include "frontend/Token.h"
-#include "frontend/TokenType.h"
-#include "frontend/Scanner.h"
+#include "../include/frontend/Token.h"
+#include "../include/frontend/TokenType.h"
+#include "../include/frontend/Scanner.h"
 
-#include "exception/MalformedIdentifier.h"
-#include "exception/UnknownOperator.h"
+#include "../include/exception/MalformedIdentifier.h"
+#include "../include/exception/UnknownOperator.h"
 
 #include <cstdio>
 #include <sstream>
