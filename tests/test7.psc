@@ -1,13 +1,13 @@
 var
     s, p is int;
-    var is int;
+    pudim is int;
 
 begin
     s := 0;
 
     do
         out({Valor a ser somado: });
-        in(p);
+        in(k);
         s := s+p;
     while p!=0;
 

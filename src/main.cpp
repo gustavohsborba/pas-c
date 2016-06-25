@@ -1,4 +1,5 @@
 #include <iostream>
+#include <exception>
 #include <fstream>
 #include <unistd.h>
 
@@ -11,12 +12,15 @@
 #include "exception/MalformedIdentifier.h"
 #include "exception/UnknownOperator.h"
 #include "exception/SyntaxError.h"
+#include "exception/SymbolAlreadyInstalled.h"
+#include "exception/SymbolNotFound.h"
 #include "frontend/Scanner.h"
 #include "frontend/Syntax.h"
 
 
 using std::cout;
 using std::endl;
+using std::exception;
 using std::fstream;
 
 int main(int argc, char** argv) {
@@ -48,11 +52,19 @@ int main(int argc, char** argv) {
 		cout << "ERROR in line " << scan.getLineCount()+1
 			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
 			 << ": " << ex.what() << endl;	
-	}	catch (SyntaxError& ex) {
+	} catch (SyntaxError& ex) {
 		cout << "ERROR in line " << scan.getLineCount()+1
 			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
 			 << ": " << ex.what() << endl;
-	}
+	} catch (SymbolAlreadyInstalled& ex) {
+		cout << "ERROR in line " << scan.getLineCount()+1
+			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
+			 << ": " << ex.what() << endl;
+	} catch (SymbolNotFound& ex) {
+		cout << "ERROR in line " << scan.getLineCount()+1
+			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
+			 << ": " << ex.what() << endl;
+	} 
 
 
 	return 0;

@@ -2,11 +2,11 @@
 // Crmatched by gustavo on 15/05/16.
 //
 
-#include "../include/frontend/Syntax.h"
-#include "../include/frontend/Scanner.h"
-#include "../include/frontend/Token.h"
-#include "../include/frontend/TokenType.h"
-#include "../include/exception/SyntaxError.h"
+#include "frontend/Syntax.h"
+#include "frontend/Scanner.h"
+#include "frontend/Token.h"
+#include "frontend/TokenType.h"
+#include "exception/SyntaxError.h"
 
 void Syntax::analyse(){
     findProgram();
@@ -14,22 +14,10 @@ void Syntax::analyse(){
 
 // ---------- Token Consumer methods:
 
-inline bool Syntax::checkToken(long t) {
-    return  tok.getType() & t;
-}
-
-inline void Syntax::matchToken(long t){
-    if (tok.getType() & t) advance();
-    else error(t, tok);
-}
-
-inline void Syntax::advance(){
-    tok = scanner->nextToken(); //lê próximo token
-}
-
-
 void Syntax::error(long t, Token tok) {
-    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount(), tok);
+    //vector<TokenType> expected = unmask(t);
+
+    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount());
 }
 
 void Syntax::error() {

@@ -110,19 +110,17 @@ Compiladores \\
 	\subsection{Modificações na Gramática da Linguagem}
 	\label{gramatica}
 
-		Na primeira parte do trabalho foi apresentada a gramática original da linguagem proposta em sala de aula.
-		A fim de tornar a implementação de um parser descendente recursivo possível, 
-		foram necessárias modificações nessa gramática, que são descritas na presente seção.
-	
-		Eliminamos recursão à esquerda das produções \textit{simple-expr} e \textit{term}, e retiramos produções
+		Realizamos modificações na gramática original da linguagem, de forma a tornar a implementação
+		de um parser recursivo descendente possível. 
+		Eliminamos recursão à esquerda das produções \textbf{simple-expr} e \textbf{term}, e retiramos produções
 		não significantes para as construções gramaticais, i.e., aquelas produções que geram apenas um 
-		símbolo não-terminal.
+		símbolo não terminal.
 		
 		Para eliminar a recursão a esquerda das produções de expressões aritiméticas, trocamos a ordem que elas devem
-		ser interpretadas, e.g., na gramatica original consta \textit{term ::= term mulop factor-a} o que semanticamente
-		é o mesmo que \textit{term ::= factor-a mulop term} graças a associatividade do operador \textit{mulop}.
+		ser interpretadas, e.g., na gramatica original consta \textbf{term ::= term mulop factor-a} o que semanticamente
+		é o mesmo que \textbf{term ::= factor-a mulop term} graças a associatividade do operador \textbf{mulop}.
 		
-		A gramática resultante é apresentada em \autoref{lst:gramaticaResultante}.
+		A gramática resultante é apresentada em \autoref{lst:gramaticaResultante}
 		\newpage
 \begin{lstlisting}[label={lst:gramaticaResultante}, caption={Gramática alterada para implementação do parser recursivo}]
 program ::= [ var decl-list] begin stmt-list end
@@ -164,10 +162,10 @@ caractere ::= um dos 256 caracteres do conjunto ASCII,
 	
 	\subsection{Compilando o Compilador Pas-c}
 
-		Para compilar o projeto (neste momento, apenas como analizador sintático), basta ter um compilador G++ versão 4.8 
+		Para compilar o seu código (neste momento, apenas como analizador léxico), basta ter um compilador G++ versão 4.8 
 		ou superior com cmake ou make instalado em sua máquina.
 		
-		Na pasta do projeto, execute o comando:
+		Na pasta do projeto execute o comando:
 \begin{lstlisting}[language=C++]
 make
 \end{lstlisting} 
@@ -201,8 +199,8 @@ g++  src/main.o src/Scanner.o src/Scope.o src/Symbol.o src/Syntax.o src/TestCase
 	
 	\subsection{A abordagem utilizada na implementação}
 		
-		O projeto foi desenvolvido utilizando um analisador sintático recursivo descendente,
-		em que para cada produção gramatical existe um método que espera um determinado tipo de 
+		O projeto foi desenvolvido na abordagem mais prática, utilizando um analisador sintático recursivo descendente,
+		em que para cada produção gramatical existe um método no analisador sintático que espera um determinado tipo de 
 		token na entrada e toma a decisão de que método seguir baseada nesste token.
 		
 	\subsection{A Estrutura do Projeto}

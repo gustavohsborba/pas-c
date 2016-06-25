@@ -19,9 +19,9 @@ public:
 
 	}
 
-	const char * what() throw() {
+	const char * what() {
 		stringstream s;
-		s << "Token " << tok.getValue() << " not found";
+		s << "Identifier " << tok.getValue() << " not declared in this scope";
 		return s.str().c_str();
 	}
 
