@@ -7,8 +7,8 @@
 
 class VarExpr : public Expression {
 public:
-	VarExpr(CodeGenerator* gen, Symbol* symbol) : symbol(symbol) {
-
+	VarExpr(CodeGenerator* gen, Symbol* symbol) : Expression(gen), symbol(symbol) {
+		this->type = symbol->getType();
 	}
 
 	~VarExpr(){

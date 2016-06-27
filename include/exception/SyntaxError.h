@@ -4,7 +4,10 @@
 #include <exception>
 #include <sstream>
 
+#include "frontend/Token.h"
+
 using std::stringstream;
+using std::exception;
 
 class SyntaxError : public exception {
 

@@ -2,20 +2,21 @@
 #define _STATEMENT_H
 
 #include <set>
+#include <vector>
 
-#include "frontend/CodeGenerator.h"
+#include "backend/CodeGenerator.h"
+#include "frontend/Type.h"
 
 using std::set;
-
-typedef enum ExprType {
-	EXPR_INT,
-	EXPR_STR
-}ExprType;
+using std::vector;
 
 class Statement {
 public:
-	Statement(CodeGenerator* generator) : generator(generator) {
+	Statement() {
+		generator = NULL;
+	}
 
+	Statement(CodeGenerator* generator) : generator(generator) {
 	}
 
 	~Statement() {}
@@ -30,14 +31,44 @@ protected:
 	int nextInst;
 };
 
-class ConditionalStmt : public Statement {
+class Expression : public Statement {
+
 public:
-	ConditionalStmt(CodeGenerator* generator)  {
-		Statement::Statement(generator);
+	Expression(CodeGenerator* generator) : Statement(generator){
+		
 	}
 
-	virtual ~ConditionalStmt() = 0;
-	virtual void emmit() = 0;
+	inline ExprType getType() {
+		return this->type;
+	}
+
+	inline void setType(ExprType type) {
+		this->type = type;
+	}
+
+protected:
+	ExprType type;
+};
+
+class ConditionalStmt : public Statement {
+public:
+
+	ConditionalStmt(CodeGenerator* generator, Expression* expr, vector<Statement*> stmtList) : Statement(generator), expr(expr), stmtList(stmtList) {
+		if(expr->getType() != NATIVE_INT)
+			throw "Erro de tipo";
+
+	}
+
+	~ConditionalStmt() {
+		vector<Statement*>::iterator it = stmtList.begin();
+
+		for(; it != stmtList.end(); ++it){
+			delete *it;
+		}
+
+		stmtList.clear();
+		delete expr;
+	}
 
 	void addAddressTrueSet(int address);
 	void addAddressFalseSet(int address);
@@ -48,17 +79,10 @@ public:
 protected:
 	set<int> trueSet;
 	set<int> falseSet;
+	Expression* expr;
+
+	vector<Statement*> stmtList;
 };
 
-class Expression : public Statement {
-
-public:
-	Expression(CodeGenerator* generator) {
-		Statement::Statement(generator);
-	}
-
-protected:
-	ExprType type;
-};
 
 #endif

@@ -2,6 +2,10 @@
 #ifndef _INSTRUCTION_H
 #define _INSTRUCTION_H
 
+#include <string>
+
+using std::string;
+
 class Instruction {
 public:
 	Instruction() {

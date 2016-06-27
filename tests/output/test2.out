@@ -1,2 +1,2 @@
 Opening file tests/test2.psc...
-ERROR in line 1, column 3: Sintax error found
+ERROR in line 1, column 3: Sintax error found - Expected statement, but 'a' found

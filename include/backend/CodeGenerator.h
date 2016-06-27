@@ -2,10 +2,12 @@
 #define _CODE_GENERATOR_H
 
 #include <string>
+#include <vector>
 
 #include "backend/Instruction.h"
 
 using std::string;
+using std::vector;
 
 class Instruction;
 

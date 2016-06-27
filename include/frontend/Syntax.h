@@ -6,13 +6,19 @@
 #define _SYNTAX_H
 
 
-#include "Token.h"
-#include "TokenType.h"
-#include "Scanner.h"
-#include "Scope.h"
-#include "Symbol.h"
+#include <exception>
+#include <string>
+#include <vector>
 
 #include "backend/CodeGenerator.h"
+
+#include "frontend/stmt/Statement.h"
+#include "frontend/Scanner.h"
+#include "frontend/Scope.h"
+#include "frontend/Symbol.h"
+#include "frontend/Token.h"
+#include "frontend/TokenType.h"
+
 
 using std::string;
 using std::exception;
@@ -29,9 +35,8 @@ public:
     /**
      * \brief construct a valid parser and get the first token
      */
-    Syntax(Scanner* s) : scanner(s){
+    Syntax(Scanner* s, CodeGenerator* gen) : scanner(s), gen(gen) {
         scope = new Scope();
-        gen = NULL;
         advance();
     }
 
@@ -53,9 +58,13 @@ private:
         return  tok.getType() & t;
     }
 
-    inline void matchToken(long t){
+    inline Token matchToken(long t){
+        Token ret = tok;
+
         if (tok.getType() & t) advance();
         else error(t, tok);
+
+        return ret;
     }
 
     inline void advance(){
@@ -65,27 +74,20 @@ private:
     void findProgram();
     void findDeclList();
     void findDecl();
-    void findIdentList();
+    vector<Token> findIdentList();
     void findType();
-    void findStmtLst();
-    void findStmt();
-    void findAssignStmt();
-    void findIfStmt();
-    void findDoWhileStmt();
-    void findReadStmt();
-    void findWriteStmt();
-    void findExpression();
-    void findSimpleExpr();
-    void findTerm();
-    void findFactorA();
+    vector<Statement*> findStmtLst();
+    Statement* findStmt();
+    Statement* findAssignStmt();
+    Statement* findIfStmt();
+    Statement* findDoWhileStmt();
+    Statement* findReadStmt();
+    Statement* findWriteStmt();
+    Expression* findExpression();
+    Expression* findSimpleExpr();
+    Expression* findTerm();
+    Expression* findFactorA();
     Expression* findFactor();
-    void findRelop();
-    void findAddop();
-    void findMulop();
-    void findConstant();
-    void findIntegerConst();
-    void findLiteral();
-    void findIdentifier();
 
     void error();
     void error(long tok);

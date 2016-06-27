@@ -9,11 +9,15 @@
 #include "test/SyntaxTest.h"
 #include "test/TokenTypeTest.h"
 
+#include "exception/InvalidOperation.h"
 #include "exception/MalformedIdentifier.h"
-#include "exception/UnknownOperator.h"
 #include "exception/SyntaxError.h"
 #include "exception/SymbolAlreadyInstalled.h"
 #include "exception/SymbolNotFound.h"
+#include "exception/TypeMismatch.h"
+#include "exception/UnknownOperator.h"
+
+
 #include "frontend/Scanner.h"
 #include "frontend/Syntax.h"
 
@@ -36,7 +40,7 @@ int main(int argc, char** argv) {
 	fstream code;
 	code.open(argv[1]);
 	Scanner scan(code);
-	Syntax parser(&scan);
+	Syntax parser(&scan, NULL);
 
 	Token t;
 
@@ -61,6 +65,14 @@ int main(int argc, char** argv) {
 			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
 			 << ": " << ex.what() << endl;
 	} catch (SymbolNotFound& ex) {
+		cout << "ERROR in line " << scan.getLineCount()+1
+			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
+			 << ": " << ex.what() << endl;
+	} catch (TypeMismatch& ex) {
+		cout << "ERROR in line " << scan.getLineCount()+1
+			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
+			 << ": " << ex.what() << endl;
+	} catch (InvalidOperation& ex) {
 		cout << "ERROR in line " << scan.getLineCount()+1
 			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
 			 << ": " << ex.what() << endl;

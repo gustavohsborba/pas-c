@@ -1,19 +1,20 @@
-#ifndef _ADD_EXPR_H
-#define _ADD_EXPR_H
+#ifndef _COMP_EXPR_H
+#define _COMP_EXPR_H
 
 #include "exception/TypeMismatch.h"
+
 #include "frontend/stmt/Statement.h"
 #include "frontend/Symbol.h"
+#include "frontend/TokenType.h"
 
 /**
  * \brief It represent both int addition and string concatenation. The only semantic check
  * is if the left and right sides of expression are of the same type.
  */
-class AddExpr : public Expression {
+class CompExpr : public Expression {
 
 public:
-
-	AddExpr(CodeGenerator* gen, Expression *left, Expression *right) : Expression(gen), left(left), right(right) {
+	CompExpr(CodeGenerator* gen, TokenType op,  Expression *left, Expression *right) : Expression(gen), op(op), left(left), right(right) {
 		
 		if (left->getType() != right->getType()) {
 			throw TypeMismatch();
@@ -24,12 +25,13 @@ public:
 
 	void emmit();
 
-	~AddExpr() {
+	~CompExpr() {
 		delete left;
 		delete right;
 	}
 
 private:
+	TokenType op;
 	Expression * left, *right;
 };
 

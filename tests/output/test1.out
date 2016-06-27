@@ -1,2 +1,2 @@
 Opening file tests/test1.psc...
-ERROR in line 4, column 6: Sintax error found
+ERROR in line 4, column 6: Sintax error found - Expected statement, but '' found
