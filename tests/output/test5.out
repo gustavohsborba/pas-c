@@ -1,2 +1,2 @@
 Opening file tests/test5.psc...
-ERROR in line 4, column 11: Sintax error found - Expected statement, but 'real' found
+ERROR in line 4, column 11: Sintax error found - Expected TOK_IS,  but 'real' found

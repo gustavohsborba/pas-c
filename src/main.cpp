@@ -48,6 +48,8 @@ int main(int argc, char** argv) {
 	try {
 		parser.analyse();
 
+		cout << "compilation finished with success" << endl;
+
 	} catch (MalformedIdentifier& ex) {
 		cout << "ERROR in line " << scan.getLineCount()+1
 			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
@@ -77,7 +79,6 @@ int main(int argc, char** argv) {
 			 << ", column " << scan.getColumnCount()-t.getValue().size()+1
 			 << ": " << ex.what() << endl;
 	} 
-
 
 	return 0;
 }

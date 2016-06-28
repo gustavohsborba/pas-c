@@ -6,10 +6,6 @@
 #include "frontend/stmt/Statement.h"
 #include "frontend/Symbol.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 class AssignStmt : public Statement {
 public:
 	AssignStmt(CodeGenerator* gen, Symbol* var, Expression *expr) : Statement(gen), var(var), expr(expr) {

@@ -30,6 +30,11 @@
 #include "frontend/stmt/ReadStmt.h"
 #include "frontend/stmt/WriteStmt.h"
 
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
 void Syntax::analyse(){
     findProgram();
 }
@@ -41,7 +46,7 @@ void Syntax::analyse(){
 void Syntax::error(long t, Token tok) {
     //vector<TokenType> expected = unmask(t);
 
-    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount(), tok);
+    throw SyntaxError(scanner->getLineCount(), scanner->getColumnCount(), t, tok);
 }
 
 void Syntax::error() {
@@ -230,7 +235,6 @@ Expression* Syntax::findExpression() {
         right = findSimpleExpr();
     } else return left;
 
-    /// TODO must create a CompExpr and return new CompExpr(gen, tok, left, right) 
     return new CompExpr(gen, tok.getType(), left, right);
 }
 
@@ -342,9 +346,8 @@ Expression* Syntax::findFactor(){
             case TOK_CONST_STR:
                 expr = new ConstStrExpr(gen, tok.getValue());
                 break;
-        } 
-
-        return expr;
+        }
     }
+    return expr;
 }
 

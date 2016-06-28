@@ -3,7 +3,7 @@ project(pas_c)
 
 include_directories(include)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRUN_TESTS -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++11")
 
 set(SOURCE_FILES
         src/main.cpp
@@ -12,6 +12,10 @@ set(SOURCE_FILES
         src/Symbol.cpp
         src/Syntax.cpp
         src/TestCase.cpp
-        src/Token.cpp src/TokenType.cpp include/test/TokenTypeTest.h)
+        src/Token.cpp
+        src/TokenType.cpp
+        src/Expressions.cpp
+        src/Statements.cpp
+        include/test/TokenTypeTest.h)
 
-add_executable(pas_c ${SOURCE_FILES})
+add_executable(pasc ${SOURCE_FILES})

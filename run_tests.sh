@@ -1,6 +1,7 @@
 #!/bin/bash
 
-for i in $(seq 1 9); do
-    rm -rf tests/output/test${i}.out
-    ./pasc tests/test${i}.psc >> tests/output/test${i}.out 
+rm -rf tests/output/*
+
+for file in $(ls tests/*.psc); do
+    ./pasc ${file} > "tests/output/$(basename $file | cut -f1 -d".").out"
 done
