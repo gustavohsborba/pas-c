@@ -229,8 +229,8 @@ Statement* Syntax::findWriteStmt(){
 Expression* Syntax::findExpression() {
     Expression* left = findSimpleExpr(), *right;
 
-    if(checkToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE)) {
-        matchToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE);
+    if(checkToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE | TOK_DIFF)) {
+        matchToken(TOK_EQUALS | TOK_GT | TOK_GTE | TOK_LT | TOK_LTE | TOK_DIFF);
         
         right = findSimpleExpr();
     } else return left;

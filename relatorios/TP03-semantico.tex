@@ -1,0 +1,531 @@
+\documentclass[11pt]{article}
+
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+%\usepackage{multirow}
+%\usepackage{subfigure}
+%\usepackage{a4wide}
+\usepackage{fancyhdr}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{empheq}
+\usetikzlibrary{trees}
+\usepackage{amssymb,amsmath}
+\usepackage{amsthm,amsfonts}
+\usepackage{float}
+\graphicspath{ {images/} }
+\usepackage{listings}
+\usepackage{color}
+\usepackage{hyperref}
+
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0.1pt}
+
+
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  columns=flexible,
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  %deletekeywords={...},           % if you want to delete keywords from the given language
+  %escapeinside={\%*}{*)},         % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=leftline,	               % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Make,                   % the language of the code
+  %otherkeywords={*,...},          % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=10pt,                  % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  %rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=4,	                   % sets default tabsize to 2 spaces
+  %title=\lstname                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+  xleftmargin=1cm
+}
+
+
+
+
+\lhead{Analisador Léxico e Tabela de Símbolos}
+\rhead{\thepage} 
+\lfoot{ Felipe Duarte, Gustavo Borba, Juan Lopes }
+\rfoot{ \today }
+\cfoot{}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{center}
+\begin{minipage}[l]{10cm}{
+\center
+Compiladores \\
+2016/01 \\
+}\end{minipage}
+ \vfill
+ \begin{minipage}[l]{11cm}{
+   \begin{center}
+   \Large{Trabalho Prático 01: \\ Analisador Léxico e Tabela de Símbolos}
+   \end{center}
+}\end{minipage}
+\end{center}
+ \vspace*{8cm}
+ \begin{center}
+ \begin{minipage}[l]{10cm}{
+ \center Felipe Duarte, Gustavo  Borba, Juan Lopes\\
+ Belo Horizonte, \today \\
+ }
+ \end{minipage}
+ \end{center}
+
+\newpage
+\thispagestyle{empty}
+\tableofcontents
+
+\newpage
+\clearpage
+\setcounter{page}{1}
+
+\section{Introdução}
+	O programa pas-c é um projeto desenvolvido na aula de Compiladores do Curso de Engenharia da Computação do CEFET-MG. 
+	Pas-c é a linguagem homônima, definida para esse compilador, cuja semântica dos comandos e expressões é a tradicional 
+	de linguagens como Pascal e C (daí seu nome).
+	
+	\subsection{Modificações na Gramática da Linguagem}
+	\label{gramatica}
+
+		Na primeira parte do trabalho foi apresentada a gramática original da linguagem proposta em sala de aula.
+		A fim de tornar a implementação de um parser descendente recursivo possível, 
+		foram necessárias modificações nessa gramática, que são descritas na presente seção.
+	
+		Eliminamos recursão à esquerda das produções \textit{simple-expr} e \textit{term}, e retiramos produções
+		não significantes para as construções gramaticais, i.e., aquelas produções que geram apenas um 
+		símbolo não-terminal.
+		
+		Para eliminar a recursão a esquerda das produções de expressões aritiméticas, trocamos a ordem que elas devem
+		ser interpretadas, e.g., na gramatica original consta \textit{term ::= term mulop factor-a} o que semanticamente
+		é o mesmo que \textit{term ::= factor-a mulop term} graças a associatividade do operador \textit{mulop}.
+		
+		A gramática resultante é apresentada em \autoref{lst:gramaticaResultante}.
+		\newpage
+\begin{lstlisting}[label={lst:gramaticaResultante}, caption={Gramática alterada para implementação do parser recursivo}]
+program ::= [ var decl-list] begin stmt-list end
+decl-list ::= decl ";" { decl ";"}
+decl ::= ident-list is type
+ident-list ::= identifier {"," identifier}
+type ::= int | string
+stmt-list ::= stmt ";" { stmt ";"}
+stmt ::= assign-stmt | if-stmt | do-stmt | read-stmt | write-stmt
+assign-stmt ::= identifier ":=" simple_expr
+if-stmt ::= if expression then stmt-list end 
+			| if expression then stmt-list else stmt-list end
+do-stmt ::= do stmt-list while expression
+read-stmt ::= in "(" identifier ")"
+write-stmt ::= out "(" simple-expr ")"
+expression ::= simple-expr | simple-expr relop simple-expr
+simple-expr ::= term | term addop simple-expr
+term ::= factor-a | factor-a mulop term
+fator-a ::= factor | not factor | "-" factor
+factor ::= identifier | constant | "(" expression ")"
+relop ::= "=" | ">" | ">=" | "<" | "<=" | "<>"
+addop ::= "+" | "-" | or
+mulop ::= "*" | "/" | and
+constant ::= integer_const | literal
+integer_const ::= nozero {digit} | "0"
+literal ::= " {" {caractere} "}"
+identifier ::= (letter) {letter | digit } 
+				| "_" (letter | digit ) {letter | digit }
+letter ::= [A-Za-z]
+digit ::= [0-9]
+nozero ::= [1-9]
+caractere ::= um dos 256 caracteres do conjunto ASCII, 
+				exceto "{", "}" e quebra de linha
+\end{lstlisting}
+
+\newpage
+\section{Uso do compilador}
+
+	
+	\subsection{Compilando o Compilador Pas-c}
+
+		Para compilar o projeto (neste momento, apenas como analizador sintático), basta ter um compilador G++ versão 4.8 
+		ou superior com cmake ou make instalado em sua máquina.
+		
+		Na pasta do projeto, execute o comando:
+\begin{lstlisting}[language=C++]
+make
+\end{lstlisting} 
+		
+		Esse comando deverá gerar a seguinte seqûencia de comandos:
+\begin{lstlisting}[language=C++]
+g++ -Iinclude -c -g  src/main.cpp -o src/main.o
+g++ -Iinclude -c -g  src/Scanner.cpp -o src/Scanner.o
+g++ -Iinclude -c -g  src/Scope.cpp -o src/Scope.o
+g++ -Iinclude -c -g  src/Symbol.cpp -o src/Symbol.o
+g++ -Iinclude -c -g  src/Syntax.cpp -o src/Syntax.o
+g++ -Iinclude -c -g  src/TestCase.cpp -o src/TestCase.o
+g++ -Iinclude -c -g  src/Token.cpp -o src/Token.o
+g++ -Iinclude -c -g  src/TokenType.cpp -o src/TokenType.o
+g++  src/main.o src/Scanner.o src/Scope.o src/Symbol.o src/Syntax.o src/TestCase.o src/Token.o src/TokenType.o -o pasc
+\end{lstlisting}
+
+	Utilizando a diretiva \textit{test} do comando make é possível visualizar o resultado dos testes unitários.
+	
+	\subsection{Compilando um programa em Pas-c}
+	
+		Para executar o compilador, basta executar o comando:
+		
+		\begin{verbatim}
+			pasc caminho_para_seu_codigo.pasc
+		\end{verbatim}
+	
+
+\newpage
+\section{A Implementação do Compilador}
+	
+	\subsection{A abordagem utilizada na implementação}
+		
+		Utilizando Tradução dirigida por Sintaxe e um analisador sintático recursivo descendente, o projeto foi desenvolvido anexando regras e funcionalidades ao analisador sintático. Foram geradas classes para cada tipo de produção da gramática que possuísse uma ação semântica distinta. Dessa forma, cada bloco semântico tem por responsabilidade verificar sua própria corretude, uma vez que ações, atributos e regras semânticas são encapsuladas nesse bloco.
+		
+	\subsection{A Estrutura do Projeto}
+		
+		O projeto segue a estrutura básica de todo projeto em C++, contendo uma pasta \textbf{include} e, dentro desta, separados por módulos, os headers (.h) com as declarações das classes. A pasta \textbf{src} contém a implementação das classes, bem como a função principal \textbf{main}:
+		
+		\begin{verbatim}
+			include/ -- Pasta para os headers
+			include/frontend -- pasta contendo as definições para os analisadores.
+			include/frontend/stmt -- Pasta contendo as implementações de 
+			                         Expressions e Statements
+			include/backend -- ainda por fazer.
+			include/test -- Pasta com os headers referentes aos testes unitários
+			src/ -- Implementação das classes
+			tests/ -- Pasta com a implementação dos testes unitários 
+		\end{verbatim}
+		
+		
+		
+	\subsection{Principais Classes da Aplicação}
+		
+		
+		\begin{itemize}
+			
+			\item \textbf{Token: }A classe Token descreve a unidade lógica mais básica do compilador. 
+			Ela apresenta apenas um valor, em formato de cadeia de caracteres, e seu \textbf{Tipo}, 
+			a ser elucidado no próximo item. 
+			
+			\item \textbf{TokenType: } TokenType trata-se apenas de um enum, que define, 
+			através de um bitmap, a lista de tokens reconhecidos pelo compilador, bem como um tipo UNKNOWN, 
+			para todo e qualquer token que não corresponder a nenhuma definição da linguagem.
+			
+			\item \textbf{Scanner: } O analisador léxico está concentrado basicamente na classe Scanner. 
+			Essa classe contém os métodos \textbf{getNumerical}, \textbf{getLiteral} e \textbf{getOperator}, 
+			que são responsáveis por captar os tokens, bem como o método \textbf{getString}. 
+			Este último é necessário por que uma vez que se abre um caracter delimitador de string, 
+			espacos em brancos passam a ser caracteres significativos. 
+			Também estão definidos nessa classe os contadores de linhas e colunas do código-fonte.
+			
+			\item \textbf{Scope: } É a classe que definie o escopo de uma variável. 
+			Cada instância de Scope contém uma tabela com os símbolos daquele escopo e um ponteiro para seu "escopo pai".
+			
+			\item \textbf{Syntax: } É a classe que implementa o parser recursivo descendente. 
+			ela comunica com o analisador léxico (\textbf{Scanner}), solicitando o próximo Token lido do arquivo de entrada.
+			Os métodos privados \textbf{findX()}, onde X é uma produção da gramática, sabem como interpretar cada produção
+			esperando encontrar determinados tokens na entrada ou outras produções validas. Quando o analisador sintático 
+			encontra algum token inesperado na entrada, imediatamente uma exceção é lançada. 
+			Ele também é responsável por instalar os identificadores na tabela de símbolos \textbf{Scope}. 
+			Excessões também serão lançadas  ao encontrar uma declaração duplicada de variável, ou o uso de um identificador
+			não instalado. 
+			
+			\item \textbf{Classes de Produções (Statements e Expressions): } Um conjunto de classes que, para o analisador Semantico não têm implementação de funções, mas que são parte fundamental de sua constituição. Cada uma dessas classes concentra os atributos e regras semânticas da produção que representam e são responsáveis por verificar a corretude de suas produções. Dada determinada produção semântica, o Analisador Sintático gera um objeto da classe de Produção correspondente, e em seu construtor, este objeto verifica tanto a corretude das regras sintáticas dessa produção quanto a compatibilidade dos atributos de suas subproduções. Segue a relação dessas classes:
+			
+			\begin{itemize}
+				\item \textbf{Statement} Superclasse de todas as classes que aqui terminam com Stmt. Serão, futuramente responsáveis pela execução do bloco de comandos. Atualmente, são responsáveis apenas por, em sua inicialização, verificar as regras semânticas que lhe são atribuidas.
+				\item AssignStmt: 
+				\item ReadStmt:
+				\item WhileStmt:
+				\item WriteStmt: 
+				\item IfStmt:
+				\item \textbf{Expression} Superclasse de todas as classes que aqui terminam com Expr. Tem apenas como atributo seu tipo (int ou string).
+				\item AddExpr: 
+				\item AndExpr: 
+				\item CompExpr: 
+				\item ConstIntExpr: 
+				\item ConstStrExpr: 
+				\item DivExpr: 
+				\item InvExpr: 
+				\item MultExpr: 
+				\item NotExpr: 
+				\item OrExpr: 
+				\item SubExpr: 
+				\item VarExpr: 
+			\end{itemize}
+			
+		
+		\end{itemize}
+		
+	\subsection{Excessões tratadas}
+	
+		\begin{itemize}
+			
+			\item \textbf{MalformedIdentifier} Lançada quando o \textbf{Scanner} encontra identificadores com caracteres inválidos
+			ou cujo tamanho excede o limite máximo de quinze caracteres.
+			
+			\item \textbf{SymbolAlreadyInstalled} Lançada quando o \textbf{Syntax} tenta instalar um simbolo na tabela que já
+			fora previamente instalado
+			
+			\item \textbf{SymbolNotFound} Lançada quando um identificador não é encontrado na tabela de símbolos
+			
+			\item \textbf{SyntaxError} Lançada quando um token inesperado é encontrado na entrada
+			
+			\item \textbf{UnknownOperator} Lançada quando um caractere não é identificado como operador válido da linguagem
+			
+			\item \textbf{TypeMismatch} Lançada quando uma produção semântica do tipo Expression ou AssignStmt encontra divergências entre os tipos das subproduções envolvidas.
+			
+			\item \textbf{InvalidOperation} Lançada quando ocorre uma operação inválida em um tipo String, por exemplo. 
+		\end{itemize}
+		
+  
+\section{Resultados dos testes especificados}
+
+	Os testes aqui realizados não exibem a tabela de símbolos: Esta é responsabilidade do analizador Sintático, que será realizado na próxima etapa.
+	Nosso projeto tem uma classe Scope, justamente para compreender essa situação, que ainda não está preparada.
+
+
+	\subsection{Teste 1}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test1.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test1.out}
+	
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test1c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test1c.out}
+	
+	\subsection{Teste 2}
+		
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test2.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test2.out}
+		
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test2c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test2c.out}
+
+
+	\subsection{Teste 3}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test3.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test3.out}
+				
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test3c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test3c.out}
+						
+		Código fonte corrigido pela segunda vez:
+		\lstinputlisting[language=Pascal]{../tests/test3c2.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test3c2.out}
+		
+		Código fonte corrigido pela terceira vez:
+		\lstinputlisting[language=Pascal]{../tests/test3c3.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test3c3.out}
+				
+		Código fonte corrigido pela quarta vez:
+		\lstinputlisting[language=Pascal]{../tests/test3c4.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test3c4.out}
+						
+		Código fonte corrigido pela quinta vez:
+		\lstinputlisting[language=Pascal]{../tests/test3c5.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test3c5.out}
+
+
+	\subsection{Teste 4}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test4.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test4.out}
+						
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test4c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test4c.out}
+						
+		Código fonte corrigido pela segunda vez:
+		\lstinputlisting[language=Pascal]{../tests/test4c2.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test4c2.out}
+		
+		Código fonte corrigido pela terceira vez:
+		\lstinputlisting[language=Pascal]{../tests/test4c3.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test4c3.out}
+				
+		Código fonte corrigido pela quarta vez:
+		\lstinputlisting[language=Pascal]{../tests/test4c4.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test4c4.out}
+						
+	\subsection{Teste 5}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test5.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test5.out}
+								
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test5c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test5c.out}
+
+	\newpage
+	\subsection{Teste 6}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test6.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test6.out}
+						
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test6c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test6c.out}
+						
+		Código fonte corrigido pela segunda vez:
+		\lstinputlisting[language=Pascal]{../tests/test6c2.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test6c2.out}
+		
+		Código fonte corrigido pela terceira vez:
+		\lstinputlisting[language=Pascal]{../tests/test6c3.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test6c3.out}
+				
+		Código fonte corrigido pela quarta vez:
+		\lstinputlisting[language=Pascal]{../tests/test6c4.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test6c4.out}
+						
+		Código fonte corrigido pela quinta vez:
+		\lstinputlisting[language=Pascal]{../tests/test6c5.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test6c5.out}
+								
+		Código fonte corrigido pela sexta vez:
+		\lstinputlisting[language=Pascal]{../tests/test6c6.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test6c6.out}
+
+	\newpage
+	\subsection{Teste 7}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test7.psc}
+			
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test7.out}
+								
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test7c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test7c.out}
+								
+		Código fonte corrigido pela segunda vez:
+		\lstinputlisting[language=Pascal]{../tests/test7c2.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test7c2.out}
+										
+		Código fonte corrigido pela terceira vez:
+		\lstinputlisting[language=Pascal]{../tests/test7c3.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test7c3.out}
+
+
+	\subsection{Teste 8}
+	
+		Código fonte testado:
+		\lstinputlisting[language=Pascal]{../tests/test8.psc}
+		
+		Saída encontrada:
+		\lstinputlisting{../tests/output/test8.out}
+										
+		Código fonte corrigido:
+		\lstinputlisting[language=Pascal]{../tests/test8c.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test8c.out}
+								
+		Código fonte corrigido pela segunda vez:
+		\lstinputlisting[language=Pascal]{../tests/test8c2.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test8c2.out}
+				
+		Código fonte corrigido pela terceira vez:
+		\lstinputlisting[language=Pascal]{../tests/test8c3.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test8c3.out}
+				
+		Código fonte corrigido pela quarta vez:
+		\lstinputlisting[language=Pascal]{../tests/test8c4.psc}
+		
+		Mensagens do compilador:
+		\lstinputlisting{../tests/output/test8c4.out}
+
+
+
+\end{document} 

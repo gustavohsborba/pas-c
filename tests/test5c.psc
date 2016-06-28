@@ -1,8 +1,5 @@
-var
-
- j, k, result is int;
-
- begin
+var j, k, result is int;
+begin
  k := k - j;
  in(j);
  in(k);
@@ -14,4 +11,4 @@ var
  end;
 
  out(result);
- end
+end
